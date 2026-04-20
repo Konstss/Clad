@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kleinanzeigen Deal-Finder</title>
+  <style>
+    /* ---- Reset & base ---- */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --border: #2e3348;
+      --accent: #4f8ef7;
+      --accent2: #7c5cfc;
+      --green: #22c55e;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --radius: 12px;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ---- Header ---- */
+    header {
+      background: linear-gradient(135deg, #1a1d27 0%, #0f1117 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 1.2rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .badge {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      color: var(--muted);
+    }
+
+    /* ---- Layout ---- */
+    .layout {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      min-height: calc(100vh - 66px);
+    }
+    @media (max-width: 860px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+
+    /* ---- Sidebar ---- */
+    aside {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.4rem;
+    }
+    .section-title {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+      margin-bottom: .5rem;
+    }
+    label {
+      font-size: 0.88rem;
+      color: var(--muted);
+      display: block;
+      margin-bottom: .35rem;
+    }
+    select, input[type="text"], input[type="range"] {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: .55rem .8rem;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color .15s;
+    }
+    select:focus, input[type="text"]:focus {
+      border-color: var(--accent);
+    }
+    select option { background: var(--surface2); }
+
+    .presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .4rem;
+    }
+    .preset-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      padding: .3rem .65rem;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .preset-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .range-row {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+    .range-row input[type="range"] {
+      flex: 1;
+      padding: 0;
+      height: 6px;
+      accent-color: var(--accent);
+    }
+    .range-val {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 3rem;
+      text-align: right;
+    }
+
+    .pages-row {
+      display: flex;
+      gap: .5rem;
+    }
+    .page-btn {
+      flex: 1;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      padding: .45rem 0;
+      cursor: pointer;
+      text-align: center;
+      transition: all .15s;
+    }
+    .page-btn.active, .page-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(79,142,247,.08);
+    }
+
+    .search-btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: .75rem 0;
+      cursor: pointer;
+      transition: opacity .15s, transform .1s;
+      margin-top: auto;
+    }
+    .search-btn:hover { opacity: .9; }
+    .search-btn:active { transform: scale(.98); }
+    .search-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* ---- Main content ---- */
+    main {
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+    }
+
+    /* ---- Stats bar ---- */
+    .stats-bar {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+    .stat-chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .5rem 1rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .stat-chip span {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    /* ---- Loading ---- */
+    #loading {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 2rem;
+      gap: 1.2rem;
+    }
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ---- Empty / error states ---- */
+    #empty-state, #error-state {
+      display: none;
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--muted);
+    }
+    #empty-state .icon, #error-state .icon { font-size: 3rem; margin-bottom: 1rem; }
+
+    /* ---- Deal cards grid ---- */
+    #results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.2rem;
+    }
+
+    .deal-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: border-color .2s, transform .15s;
+      display: flex;
+      flex-direction: column;
+    }
+    .deal-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .card-img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      background: var(--surface2);
+    }
+    .card-no-img {
+      width: 100%;
+      height: 160px;
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      color: var(--border);
+    }
+
+    .card-body {
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: .55rem;
+      flex: 1;
+    }
+
+    .card-label {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: .2rem .6rem;
+      border-radius: 5px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      align-self: flex-start;
+    }
+    .label-fire   { background: rgba(239,68,68,.15); color: #ef4444; border: 1px solid rgba(239,68,68,.3); }
+    .label-great  { background: rgba(245,158,11,.15); color: #f59e0b; border: 1px solid rgba(245,158,11,.3); }
+    .label-good   { background: rgba(34,197,94,.15);  color: #22c55e; border: 1px solid rgba(34,197,94,.3); }
+    .label-deal   { background: rgba(79,142,247,.15); color: #4f8ef7; border: 1px solid rgba(79,142,247,.3); }
+
+    .card-title {
+      font-size: .95rem;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.35;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-device {
+      font-size: .78rem;
+      color: var(--muted);
+    }
+
+    .price-row {
+      display: flex;
+      align-items: baseline;
+      gap: .6rem;
+      flex-wrap: wrap;
+    }
+    .price-ask {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--green);
+    }
+    .price-market {
+      font-size: .82rem;
+      color: var(--muted);
+      text-decoration: line-through;
+    }
+    .price-savings {
+      font-size: .8rem;
+      color: var(--yellow);
+      font-weight: 600;
+    }
+
+    .discount-bar-wrap {
+      background: var(--surface2);
+      border-radius: 4px;
+      height: 6px;
+      overflow: hidden;
+    }
+    .discount-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--green), var(--accent));
+      border-radius: 4px;
+      transition: width .6s ease;
+    }
+    .discount-label {
+      font-size: .78rem;
+      color: var(--muted);
+      margin-top: .2rem;
+    }
+
+    .meta-row {
+      display: flex;
+      gap: .8rem;
+      font-size: .78rem;
+      color: var(--muted);
+      flex-wrap: wrap;
+    }
+    .meta-icon { margin-right: .2rem; }
+
+    .condition-pill {
+      display: inline-block;
+      font-size: .72rem;
+      padding: .15rem .5rem;
+      border-radius: 4px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .card-footer {
+      padding: .8rem 1rem;
+      border-top: 1px solid var(--border);
+    }
+    .view-btn {
+      display: block;
+      width: 100%;
+      text-align: center;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--accent);
+      font-size: .88rem;
+      font-weight: 600;
+      padding: .5rem 0;
+      text-decoration: none;
+      transition: background .15s, border-color .15s;
+    }
+    .view-btn:hover {
+      background: rgba(79,142,247,.1);
+      border-color: var(--accent);
+    }
+
+    /* ---- Welcome state ---- */
+    #welcome {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 2rem;
+      text-align: center;
+      gap: 1rem;
+      color: var(--muted);
+    }
+    #welcome .big-icon { font-size: 4rem; }
+    #welcome h2 { font-size: 1.4rem; color: var(--text); }
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+      margin-top: .5rem;
+      text-align: left;
+    }
+    .feature-list li::before { content: "✓ "; color: var(--green); font-weight: 700; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>📡 Kleinanzeigen Deal-Finder</h1>
+  <span class="badge">≥25% unter Marktpreis</span>
+</header>
+
+<div class="layout">
+  <!-- ===== Sidebar ===== -->
+  <aside>
+    <div>
+      <p class="section-title">Schnellauswahl</p>
+      <div class="presets">
+        {% for p in presets %}
+        <button class="preset-btn"
+                data-query="{{ p.query }}"
+                data-hint="{{ p.hint }}">{{ p.label }}</button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div>
+      <p class="section-title">Suche</p>
+      <label>Suchbegriff</label>
+      <input type="text" id="query" placeholder="z.B. iPhone 14, ThinkPad…" />
+    </div>
+
+    <div>
+      <label>Region / Bundesland</label>
+      <select id="region">
+        {% for r in regions %}
+        <option value="{{ r.slug }}">{{ r.label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div>
+      <p class="section-title">Filter</p>
+      <label>Mindest-Rabatt</label>
+      <div class="range-row">
+        <input type="range" id="threshold" min="10" max="60" value="25" step="5" />
+        <span class="range-val" id="threshold-val">25%</span>
+      </div>
+    </div>
+
+    <div>
+      <label>Seiten scrapen (mehr = langsamer)</label>
+      <div class="pages-row" id="pages-row">
+        <button class="page-btn active" data-pages="1">1</button>
+        <button class="page-btn active" data-pages="2">2</button>
+        <button class="page-btn active" data-pages="3">3 ✓</button>
+        <button class="page-btn" data-pages="4">4</button>
+        <button class="page-btn" data-pages="5">5</button>
+      </div>
+    </div>
+
+    <button class="search-btn" id="search-btn">🔍 Deals suchen</button>
+  </aside>
+
+  <!-- ===== Main ===== -->
+  <main>
+    <!-- Welcome -->
+    <div id="welcome">
+      <div class="big-icon">🛒</div>
+      <h2>Finde Schnäppchen auf Kleinanzeigen</h2>
+      <p>Der Algorithmus vergleicht Angebotspreise mit Marktpreisen<br>
+         und berücksichtigt dabei den Zustand des Geräts.</p>
+      <ul class="feature-list">
+        <li>Zustandskorrektur (Neu, Sehr gut, Gut, Akzeptabel, Defekt)</li>
+        <li>Marktpreisdatenbank: {{ stats.total }} Gerätemodelle</li>
+        <li>Konfigurierbare Rabattschwelle (Standard: 25 %)</li>
+        <li>Regionale Suche nach Bundesland oder Stadt</li>
+      </ul>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading">
+      <div class="spinner"></div>
+      <p id="loading-text">Suche läuft…</p>
+    </div>
+
+    <!-- Stats bar (hidden initially) -->
+    <div class="stats-bar" id="stats-bar" style="display:none">
+      <div class="stat-chip">Anzeigen gefunden: <span id="st-listings">—</span></div>
+      <div class="stat-chip">Deals (≥ Schwelle): <span id="st-deals">—</span></div>
+      <div class="stat-chip">Suche: <span id="st-query">—</span></div>
+      <div class="stat-chip">Region: <span id="st-region">—</span></div>
+    </div>
+
+    <!-- Empty -->
+    <div id="empty-state">
+      <div class="icon">😕</div>
+      <p>Keine Deals gefunden.</p>
+      <p style="margin-top:.5rem;font-size:.85rem">Versuche eine andere Region, mehr Seiten oder einen niedrigeren Rabatt-Schwellenwert.</p>
+    </div>
+
+    <!-- Error -->
+    <div id="error-state">
+      <div class="icon">⚠️</div>
+      <p id="error-msg">Ein Fehler ist aufgetreten.</p>
+    </div>
+
+    <!-- Results grid -->
+    <div id="results-grid"></div>
+  </main>
+</div>
+
+<script>
+  // ---- State ----
+  let selectedPages = 3;
+
+  // ---- Pages selector ----
+  document.querySelectorAll('.page-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedPages = parseInt(btn.dataset.pages);
+      document.querySelectorAll('.page-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  // ---- Threshold slider ----
+  const thresholdEl = document.getElementById('threshold');
+  const thresholdVal = document.getElementById('threshold-val');
+  thresholdEl.addEventListener('input', () => {
+    thresholdVal.textContent = thresholdEl.value + '%';
+  });
+
+  // ---- Preset buttons ----
+  document.querySelectorAll('.preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.getElementById('query').value = btn.dataset.query;
+      // Store hint for search
+      document.getElementById('query').dataset.hint = btn.dataset.hint;
+    });
+  });
+
+  // ---- Search ----
+  document.getElementById('search-btn').addEventListener('click', runSearch);
+  document.getElementById('query').addEventListener('keydown', e => {
+    if (e.key === 'Enter') runSearch();
+  });
+
+  async function runSearch() {
+    const query = document.getElementById('query').value.trim();
+    if (!query) {
+      document.getElementById('query').focus();
+      return;
+    }
+
+    const region = document.getElementById('region').value;
+    const regionLabel = document.getElementById('region').options[document.getElementById('region').selectedIndex].text;
+    const threshold = parseInt(thresholdEl.value) / 100;
+    const hint = document.getElementById('query').dataset.hint || '';
+
+    showLoading(query);
+
+    try {
+      const resp = await fetch('/api/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, region, hint, max_pages: selectedPages, threshold }),
+      });
+      const data = await resp.json();
+
+      if (!resp.ok || data.error) {
+        showError(data.error || 'Unbekannter Fehler');
+        return;
+      }
+
+      renderResults(data, query, regionLabel);
+    } catch (err) {
+      showError('Netzwerkfehler: ' + err.message);
+    }
+  }
+
+  function showLoading(query) {
+    hide('welcome');
+    hide('empty-state');
+    hide('error-state');
+    hide('stats-bar');
+    document.getElementById('results-grid').innerHTML = '';
+    document.getElementById('loading-text').textContent = `Suche nach "${query}"…`;
+    show('loading', 'flex');
+    document.getElementById('search-btn').disabled = true;
+  }
+
+  function showError(msg) {
+    hide('loading');
+    hide('empty-state');
+    document.getElementById('error-msg').textContent = msg;
+    show('error-state');
+    document.getElementById('search-btn').disabled = false;
+  }
+
+  function renderResults(data, query, regionLabel) {
+    hide('loading');
+    show('stats-bar');
+    document.getElementById('search-btn').disabled = false;
+    document.getElementById('st-listings').textContent = data.listings_found;
+    document.getElementById('st-deals').textContent = data.deals_found;
+    document.getElementById('st-query').textContent = query;
+    document.getElementById('st-region').textContent = regionLabel;
+
+    if (!data.deals || data.deals.length === 0) {
+      show('empty-state');
+      return;
+    }
+
+    const grid = document.getElementById('results-grid');
+    grid.innerHTML = '';
+    data.deals.forEach(d => grid.appendChild(buildCard(d)));
+  }
+
+  function buildCard(d) {
+    const card = document.createElement('div');
+    card.className = 'deal-card';
+
+    // Image
+    if (d.image_url) {
+      const img = document.createElement('img');
+      img.className = 'card-img';
+      img.src = d.image_url;
+      img.alt = d.title;
+      img.onerror = () => img.replaceWith(noImg());
+      card.appendChild(img);
+    } else {
+      card.appendChild(noImg());
+    }
+
+    // Body
+    const body = document.createElement('div');
+    body.className = 'card-body';
+
+    // Label
+    const label = document.createElement('span');
+    label.className = 'card-label ' + labelClass(d.deal_label);
+    label.textContent = d.deal_label;
+    body.appendChild(label);
+
+    // Title
+    const title = document.createElement('div');
+    title.className = 'card-title';
+    title.textContent = d.title;
+    body.appendChild(title);
+
+    // Device match
+    const device = document.createElement('div');
+    device.className = 'card-device';
+    device.textContent = '🔍 Erkannt: ' + d.device_name;
+    body.appendChild(device);
+
+    // Price row
+    const priceRow = document.createElement('div');
+    priceRow.className = 'price-row';
+    priceRow.innerHTML = `
+      <span class="price-ask">${fmt(d.price)} €</span>
+      <span class="price-market">${fmt(d.expected_price)} €</span>
+      <span class="price-savings">−${fmt(d.savings)} € gespart</span>
+    `;
+    body.appendChild(priceRow);
+
+    // Discount bar
+    const barWrap = document.createElement('div');
+    barWrap.className = 'discount-bar-wrap';
+    const bar = document.createElement('div');
+    bar.className = 'discount-bar';
+    bar.style.width = Math.min(d.discount_pct, 80) + '%';
+    barWrap.appendChild(bar);
+    body.appendChild(barWrap);
+    const barLabel = document.createElement('div');
+    barLabel.className = 'discount-label';
+    barLabel.textContent = `${d.discount_pct}% unter Marktpreis · Marktpreis (Gut): ${fmt(d.market_base_price)} €`;
+    body.appendChild(barLabel);
+
+    // Meta
+    const meta = document.createElement('div');
+    meta.className = 'meta-row';
+    meta.innerHTML = `
+      <span><span class="meta-icon">📍</span>${d.location || '—'}</span>
+      <span><span class="meta-icon">📅</span>${d.posted_date || '—'}</span>
+      <span class="condition-pill">Zustand: ${d.condition}</span>
+    `;
+    body.appendChild(meta);
+
+    card.appendChild(body);
+
+    // Footer
+    const footer = document.createElement('div');
+    footer.className = 'card-footer';
+    const link = document.createElement('a');
+    link.className = 'view-btn';
+    link.href = d.url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.textContent = '→ Auf Kleinanzeigen ansehen';
+    footer.appendChild(link);
+    card.appendChild(footer);
+
+    return card;
+  }
+
+  function noImg() {
+    const d = document.createElement('div');
+    d.className = 'card-no-img';
+    d.textContent = '📷';
+    return d;
+  }
+
+  function labelClass(label) {
+    if (label.includes('Hammer')) return 'label-fire';
+    if (label.includes('Sehr')) return 'label-great';
+    if (label.includes('Guter')) return 'label-good';
+    return 'label-deal';
+  }
+
+  function fmt(n) {
+    return Number(n).toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+
+  function show(id, display = 'block') {
+    document.getElementById(id).style.display = display;
+  }
+  function hide(id) {
+    document.getElementById(id).style.display = 'none';
+  }
+</script>
+</body>
+</html>
