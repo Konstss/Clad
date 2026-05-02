@@ -1,0 +1,1993 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#040a06">
+  <title>GNT Group — Natürliche Farben. Nachhaltige Zukunft.</title>
+  <style>
+    /* ════════════════════════════════════════════
+       CSS @PROPERTY — Animatable gradient stops
+    ════════════════════════════════════════════ */
+    @property --grad-angle {
+      syntax: '<angle>';
+      initial-value: 135deg;
+      inherits: false;
+    }
+    @property --orb-hue {
+      syntax: '<number>';
+      initial-value: 140;
+      inherits: false;
+    }
+
+    /* ════════════════════════════════════════════
+       BASE & VARIABLES
+    ════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #040a06;
+      --bg2:      #071009;
+      --surface:  rgba(255,255,255,0.04);
+      --surface2: rgba(255,255,255,0.07);
+      --border:   rgba(255,255,255,0.08);
+      --border2:  rgba(255,255,255,0.14);
+      --p:        #22c55e;
+      --p2:       #4ade80;
+      --p3:       #16a34a;
+      --text:     #edf7ee;
+      --muted:    #6b7d6c;
+      --muted2:   #9db09e;
+      --red:    #ef4444; --orange: #f97316; --yellow: #eab308;
+      --lime:   #84cc16; --green:  #22c55e; --teal:   #14b8a6;
+      --cyan:   #06b6d4; --blue:   #3b82f6; --indigo: #6366f1;
+      --purple: #8b5cf6; --pink:   #ec4899; --rose:   #f43f5e;
+      --radius: 18px;
+      --shadow: 0 20px 60px rgba(0,0,0,0.5);
+      /* Emil Kowalski recommended easing curves */
+      --ease-out:    cubic-bezier(0.23, 1, 0.32, 1);
+      --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+      --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      /* Apple HIG: SF Pro on iOS, system font fallback elsewhere */
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
+                   'Segoe UI', system-ui, 'Helvetica Neue', Arial, sans-serif;
+      font-feature-settings: "ss01", "cv11", "kern";
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      overflow-x: hidden;
+      line-height: 1.6;
+      /* iOS: remove tap-highlight box, use our :active state */
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* iOS: prevent zoom on input focus (font-size >= 16px) */
+    input, select, textarea, button { font-size: 16px; }
+
+    /* ════════════════════════════════════════════
+       CANVAS / BG
+    ════════════════════════════════════════════ */
+    #hero-canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ════════════════════════════════════════════
+       SCROLL ANIMATIONS
+    ════════════════════════════════════════════ */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s cubic-bezier(0.23,1,0.32,1),
+                  transform 0.8s cubic-bezier(0.23,1,0.32,1);
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+    .reveal-left  { opacity: 0; transform: translateX(-50px); transition: opacity 0.8s cubic-bezier(0.23,1,0.32,1), transform 0.8s cubic-bezier(0.23,1,0.32,1); }
+    .reveal-right { opacity: 0; transform: translateX( 50px); transition: opacity 0.8s cubic-bezier(0.23,1,0.32,1), transform 0.8s cubic-bezier(0.23,1,0.32,1); }
+    .reveal-left.visible, .reveal-right.visible { opacity: 1; transform: none; }
+
+    /* ════════════════════════════════════════════
+       NAV
+    ════════════════════════════════════════════ */
+    #nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      /* iOS HIG: respect safe area insets (iPhone notch / Dynamic Island) */
+      padding: env(safe-area-inset-top, 0) clamp(1.5rem, 4vw, 3rem) 0;
+      padding-left:  max(clamp(1.5rem, 4vw, 3rem), env(safe-area-inset-left));
+      padding-right: max(clamp(1.5rem, 4vw, 3rem), env(safe-area-inset-right));
+      min-height: 72px;
+      height: calc(72px + env(safe-area-inset-top, 0));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.4s, backdrop-filter 0.4s, border-color 0.4s;
+      border-bottom: 1px solid transparent;
+    }
+    #nav.scrolled {
+      background: rgba(4,10,6,0.78);
+      /* iOS HIG: stronger blur + saturation boost = native vibrancy feel */
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-color: var(--border);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+    .nav-logo-mark {
+      width: 42px; height: 42px;
+      background: linear-gradient(135deg, var(--p3), var(--p2));
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 1rem;
+      color: #fff;
+      letter-spacing: -1px;
+      box-shadow: 0 0 24px rgba(34,197,94,0.35);
+      animation: logo-pulse 4s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    @keyframes logo-pulse {
+      0%,100% { box-shadow: 0 0 24px rgba(34,197,94,0.35); }
+      50%      { box-shadow: 0 0 40px rgba(74,222,128,0.55); }
+    }
+    .nav-logo-text { line-height: 1; }
+    .nav-logo-name {
+      font-size: 1.1rem; font-weight: 800;
+      background: linear-gradient(135deg, #fff 30%, var(--p2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .nav-logo-sub {
+      font-size: 0.6rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--muted2);
+      display: block; margin-top: 2px;
+    }
+
+    .nav-links {
+      display: flex; gap: 2rem; list-style: none;
+    }
+    @media (max-width: 860px) { .nav-links { display: none; } }
+    .nav-links a {
+      font-size: 0.88rem; font-weight: 500; color: var(--muted2);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      background: linear-gradient(135deg, var(--p3), var(--p));
+      border: none; border-radius: 10px;
+      color: #fff; font-size: 0.88rem; font-weight: 700;
+      padding: 0.55rem 1.3rem; cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 16px rgba(22,163,74,0.3);
+      letter-spacing: 0.02em; font-family: inherit;
+      text-decoration: none; display: inline-block;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .nav-cta:hover {
+        opacity: 0.9; transform: translateY(-1px);
+        box-shadow: 0 6px 24px rgba(22,163,74,0.45);
+      }
+    }
+    .nav-cta:active { transform: scale(0.97); transition-duration: 0.1s; }
+
+    /* All clickable elements get press feedback (Emil rule) */
+    .preset-btn:active, .page-btn:active, .view-btn:active,
+    .pill:active {
+      transform: scale(0.97);
+      transition-duration: 0.1s;
+    }
+
+    /* ════════════════════════════════════════════
+       HERO
+    ════════════════════════════════════════════ */
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 0 clamp(1.5rem, 5vw, 4rem);
+      overflow: hidden;
+    }
+
+    .hero-bg-glow {
+      position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 70% 55% at 50% 0%, rgba(34,197,94,0.14) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 40% at 20% 80%, rgba(132,204,22,0.09) 0%, transparent 55%),
+        radial-gradient(ellipse 45% 35% at 80% 70%, rgba(20,184,166,0.08) 0%, transparent 50%);
+    }
+
+    .hero-content { position: relative; z-index: 1; max-width: 920px; }
+
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--p);
+      background: rgba(34,197,94,0.1);
+      border: 1px solid rgba(34,197,94,0.25);
+      border-radius: 20px; padding: 5px 16px;
+      margin-bottom: 1.5rem;
+      animation: fadeDown 0.8s 0.1s cubic-bezier(0.23,1,0.32,1) both;
+    }
+    @keyframes fadeDown {
+      from { opacity:0; transform:translateY(-20px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    .hero-title {
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      font-weight: 900; line-height: 1.05;
+      letter-spacing: -0.025em;
+      margin-bottom: 1.5rem;
+      animation: fadeUp 0.9s 0.2s cubic-bezier(0.23,1,0.32,1) both;
+    }
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(35px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    .hero-title .line-green {
+      background: linear-gradient(135deg, var(--lime), var(--p), var(--teal));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero-title .line-spectrum {
+      background: linear-gradient(90deg,
+        var(--red), var(--orange), var(--yellow),
+        var(--green), var(--blue), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-size: 200% auto;
+      animation: spectrum-flow 4s linear infinite;
+    }
+    @keyframes spectrum-flow {
+      0%   { background-position: 0% center; }
+      100% { background-position: 200% center; }
+    }
+
+    .hero-sub {
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      color: var(--muted2); max-width: 620px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.75;
+      animation: fadeUp 0.9s 0.35s cubic-bezier(0.23,1,0.32,1) both;
+    }
+
+    .hero-actions {
+      display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+      animation: fadeUp 0.9s 0.5s cubic-bezier(0.23,1,0.32,1) both;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--p3), var(--p));
+      border: none; border-radius: 12px;
+      color: #fff; font-size: 1rem; font-weight: 700;
+      padding: 0.9rem 2.2rem; cursor: pointer;
+      text-decoration: none; display: inline-block;
+      transition: opacity .2s, transform .15s, box-shadow .2s;
+      box-shadow: 0 6px 24px rgba(22,163,74,0.4);
+      letter-spacing: 0.03em; font-family: inherit;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .btn-primary:hover { opacity:.9; transform:translateY(-2px); box-shadow:0 10px 32px rgba(22,163,74,0.5); }
+    }
+    .btn-primary:active { transform: scale(0.97); transition-duration: 0.1s; }
+
+    .btn-ghost {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      color: var(--text); font-size: 1rem; font-weight: 600;
+      padding: 0.9rem 2.2rem; cursor: pointer;
+      text-decoration: none; display: inline-block;
+      transition: background .2s, border-color .2s, transform .15s;
+      letter-spacing: 0.03em; font-family: inherit;
+      backdrop-filter: blur(8px);
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .btn-ghost:hover { background:var(--surface2); border-color:rgba(255,255,255,0.2); transform:translateY(-2px); }
+    }
+    .btn-ghost:active { transform: scale(0.97); transition-duration: 0.1s; }
+
+    .hero-scroll {
+      position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      color: var(--muted); font-size: 0.72rem; letter-spacing: 0.1em;
+      text-transform: uppercase; z-index: 1;
+      animation: fadeUp 1s 0.9s both;
+    }
+    .scroll-arrow {
+      width: 24px; height: 24px;
+      border-right: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: rotate(45deg);
+      animation: bounce 2s ease-in-out infinite;
+    }
+    @keyframes bounce {
+      0%,100% { transform:rotate(45deg) translateY(0); }
+      50%      { transform:rotate(45deg) translateY(5px); }
+    }
+
+    /* ════════════════════════════════════════════
+       SPECTRUM BAR (divider)
+    ════════════════════════════════════════════ */
+    .spectrum-bar {
+      height: 4px;
+      background: linear-gradient(90deg,
+        var(--red), var(--orange), var(--yellow),
+        var(--lime), var(--green), var(--teal),
+        var(--cyan), var(--blue), var(--indigo),
+        var(--purple), var(--pink), var(--rose));
+      background-size: 200% auto;
+      animation: spectrum-flow 6s linear infinite;
+    }
+
+    /* ════════════════════════════════════════════
+       SECTIONS
+    ════════════════════════════════════════════ */
+    section {
+      padding: clamp(4rem, 8vw, 7rem) clamp(1.5rem, 5vw, 5rem);
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+    .section-full {
+      max-width: none;
+      padding-left: 0; padding-right: 0;
+    }
+    .section-full > .inner {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 0 clamp(1.5rem, 5vw, 5rem);
+    }
+
+    .section-label {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--p);
+      margin-bottom: 1rem;
+    }
+    .section-label::before {
+      content: '';
+      display: block; width: 18px; height: 2px;
+      background: var(--p); border-radius: 1px;
+    }
+
+    .section-title {
+      font-size: clamp(2rem, 4.5vw, 3.2rem);
+      font-weight: 900; line-height: 1.1;
+      letter-spacing: -0.02em; margin-bottom: 1.2rem;
+    }
+    .section-title .hl {
+      background: linear-gradient(135deg, var(--p2), var(--teal));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .section-desc {
+      font-size: 1.05rem; color: var(--muted2);
+      max-width: 580px; line-height: 1.75;
+    }
+
+    /* ════════════════════════════════════════════
+       STATS BAR
+    ════════════════════════════════════════════ */
+    #stats {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      max-width: none;
+      padding: 0;
+    }
+    .stats-inner {
+      max-width: 1300px; margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0;
+    }
+    .stat-item {
+      padding: 2.5rem 2rem;
+      text-align: center;
+      border-right: 1px solid var(--border);
+      position: relative;
+      transition: background 0.3s;
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-item:hover { background: var(--surface); }
+
+    @media (max-width: 700px) {
+      .stats-inner { grid-template-columns: 1fr 1fr; }
+      .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
+      .stat-item:last-child { border-bottom: none; }
+    }
+
+    .stat-number {
+      font-size: clamp(2.5rem, 5vw, 3.5rem);
+      font-weight: 900; line-height: 1;
+      background: linear-gradient(135deg, var(--p2), var(--teal));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 0.4rem;
+    }
+    .stat-label {
+      font-size: 0.82rem; color: var(--muted2);
+      text-transform: uppercase; letter-spacing: 0.1em;
+    }
+
+    /* ════════════════════════════════════════════
+       ABOUT
+    ════════════════════════════════════════════ */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(2rem, 5vw, 5rem);
+      align-items: center;
+    }
+    @media (max-width: 800px) { .about-grid { grid-template-columns: 1fr; } }
+
+    .about-visual {
+      position: relative;
+      aspect-ratio: 1;
+      max-width: 500px;
+    }
+
+    .about-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(0);
+      animation: orb-float linear infinite;
+    }
+    @keyframes orb-float {
+      0%, 100% { transform: translateY(0) scale(1); }
+      33%       { transform: translateY(-15px) scale(1.04); }
+      66%       { transform: translateY(8px) scale(0.97); }
+    }
+
+    .orb-main {
+      inset: 10%;
+      background: radial-gradient(circle at 35% 35%,
+        rgba(74,222,128,0.25), rgba(34,197,94,0.12),
+        rgba(20,184,166,0.08), transparent 70%);
+      border: 1px solid rgba(74,222,128,0.15);
+      animation-duration: 8s;
+    }
+    .orb-red   { top:5%;  left:60%; width:30%; height:30%; background:radial-gradient(circle, rgba(239,68,68,0.3), transparent 70%);  animation-duration:6s;  animation-delay:-2s; }
+    .orb-orange{ bottom:15%; left:5%;  width:25%; height:25%; background:radial-gradient(circle, rgba(249,115,22,0.25), transparent 70%); animation-duration:7s;  animation-delay:-1s; }
+    .orb-blue  { bottom:5%; right:10%;width:28%; height:28%; background:radial-gradient(circle, rgba(59,130,246,0.25), transparent 70%); animation-duration:9s;  animation-delay:-3s; }
+    .orb-purple{ top:10%; left:10%; width:22%; height:22%; background:radial-gradient(circle, rgba(139,92,246,0.3),  transparent 70%); animation-duration:5.5s;animation-delay:-0.5s;}
+    .orb-yellow{ top:55%; left:40%; width:20%; height:20%; background:radial-gradient(circle, rgba(234,179,8,0.3),   transparent 70%); animation-duration:7.5s;animation-delay:-4s; }
+
+    .about-logo-center {
+      position: absolute; top:50%; left:50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+    }
+    .about-logo-circle {
+      width: 120px; height: 120px;
+      background: rgba(10,20,12,0.8);
+      border: 1px solid rgba(74,222,128,0.3);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 60px rgba(34,197,94,0.2), inset 0 0 30px rgba(34,197,94,0.05);
+    }
+    .about-logo-text {
+      font-size: 1.8rem; font-weight: 900; letter-spacing: -2px;
+      background: linear-gradient(135deg, var(--p2), #fff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    .timeline {
+      display: flex; flex-direction: column; gap: 1.5rem;
+      margin-top: 2.5rem;
+    }
+    .timeline-item {
+      display: flex; gap: 1.2rem; align-items: flex-start;
+      position: relative;
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute; left: 19px; top: 36px;
+      width: 1px; height: calc(100% + 1rem);
+      background: linear-gradient(to bottom, var(--border2), transparent);
+    }
+    .timeline-item:last-child::before { display: none; }
+    .timeline-dot {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--surface2);
+      border: 2px solid var(--p3);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 0.75rem; font-weight: 700;
+      color: var(--p); letter-spacing: -0.5px;
+    }
+    .timeline-body { padding-top: 6px; }
+    .timeline-year { font-size: 0.7rem; font-weight: 700; color: var(--p); letter-spacing: 0.1em; text-transform: uppercase; }
+    .timeline-text { font-size: 0.9rem; color: var(--muted2); margin-top: 2px; line-height: 1.55; }
+
+    /* ════════════════════════════════════════════
+       EXBERRY COLORS SECTION
+    ════════════════════════════════════════════ */
+    #colors-section {
+      background: var(--bg2);
+      max-width: none; padding: 0;
+    }
+    #colors-section .inner {
+      padding: clamp(4rem,8vw,7rem) clamp(1.5rem,5vw,5rem);
+      max-width: 1300px; margin: 0 auto;
+    }
+
+    .colors-header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 2rem;
+      align-items: end;
+      margin-bottom: 3rem;
+    }
+    @media (max-width:700px) { .colors-header { grid-template-columns:1fr; } }
+
+    .exberry-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 1.1rem; font-weight: 800;
+      color: #fff;
+      background: linear-gradient(135deg, #1a6b35, #0d4a26);
+      border: 1px solid rgba(74,222,128,0.3);
+      border-radius: 10px; padding: 8px 18px;
+      letter-spacing: 0.04em;
+    }
+    .exberry-badge .r { color: var(--p2); }
+
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 1rem;
+    }
+
+    .color-card {
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: default;
+      transition: transform 0.3s cubic-bezier(0.23,1,0.32,1), box-shadow 0.3s;
+      border: 1px solid var(--border);
+    }
+    .color-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: var(--shadow);
+    }
+    .color-swatch {
+      height: 110px;
+      position: relative;
+      overflow: hidden;
+    }
+    .color-swatch::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.35));
+    }
+    .color-swatch-orb {
+      position: absolute;
+      width: 80%; height: 80%;
+      top: 10%; left: 10%;
+      border-radius: 50%;
+      filter: blur(12px);
+      animation: orb-pulse 3s ease-in-out infinite;
+    }
+    @keyframes orb-pulse {
+      0%,100% { transform: scale(1);   opacity: 0.85; }
+      50%      { transform: scale(1.1); opacity: 1;    }
+    }
+
+    .color-info {
+      background: var(--surface);
+      padding: 0.85rem 1rem;
+      border-top: 1px solid var(--border);
+    }
+    .color-name { font-size: 0.85rem; font-weight: 700; color: var(--text); }
+    .color-source { font-size: 0.72rem; color: var(--muted2); margin-top: 2px; }
+
+    /* ════════════════════════════════════════════
+       APPLICATIONS
+    ════════════════════════════════════════════ */
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.2rem;
+      margin-top: 3rem;
+    }
+
+    .app-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.6rem 1.4rem;
+      transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s, background 0.25s;
+      cursor: default;
+      position: relative;
+      overflow: hidden;
+    }
+    .app-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, var(--card-color, rgba(34,197,94,0.06)), transparent);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .app-card:hover {
+      border-color: var(--card-color, rgba(34,197,94,0.4));
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    }
+    .app-card:hover::before { opacity: 1; }
+
+    .app-icon {
+      font-size: 2.2rem; margin-bottom: 1rem; display: block;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
+    }
+    .app-name {
+      font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 0.4rem;
+    }
+    .app-desc { font-size: 0.82rem; color: var(--muted2); line-height: 1.55; }
+
+    /* ════════════════════════════════════════════
+       WHY EXBERRY / USPs
+    ════════════════════════════════════════════ */
+    #why-section {
+      background: linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%);
+      max-width: none; padding: 0;
+    }
+    #why-section .inner {
+      padding: clamp(4rem,8vw,7rem) clamp(1.5rem,5vw,5rem);
+      max-width: 1300px; margin: 0 auto;
+    }
+
+    .usp-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.3rem;
+      margin-top: 3rem;
+    }
+    .usp-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      transition: border-color 0.25s, background 0.25s, transform 0.25s, box-shadow 0.25s;
+    }
+    .usp-card:hover {
+      border-color: rgba(74,222,128,0.3);
+      background: var(--surface2);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+    }
+    .usp-icon-wrap {
+      width: 52px; height: 52px;
+      background: rgba(34,197,94,0.1);
+      border: 1px solid rgba(34,197,94,0.2);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem;
+      margin-bottom: 1.2rem;
+    }
+    .usp-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .usp-text { font-size: 0.85rem; color: var(--muted2); line-height: 1.65; }
+
+    /* ════════════════════════════════════════════
+       SUSTAINABILITY
+    ════════════════════════════════════════════ */
+    .sustain-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(2rem,5vw,5rem);
+      align-items: start;
+      margin-top: 3rem;
+    }
+    @media (max-width:800px) { .sustain-grid { grid-template-columns: 1fr; } }
+
+    .sustain-goals { display: flex; flex-direction: column; gap: 1.4rem; }
+    .goal-item {}
+    .goal-header {
+      display: flex; justify-content: space-between;
+      align-items: baseline; margin-bottom: 0.5rem;
+    }
+    .goal-name { font-size: 0.88rem; font-weight: 600; color: var(--text); }
+    .goal-target {
+      font-size: 0.8rem; color: var(--p);
+      font-weight: 700;
+    }
+    .goal-bar-track {
+      height: 8px; border-radius: 4px;
+      background: rgba(255,255,255,0.07);
+      overflow: hidden;
+    }
+    .goal-bar {
+      height: 100%; border-radius: 4px;
+      background: linear-gradient(90deg, var(--p3), var(--p2));
+      width: 0%;
+      transition: width 1.4s cubic-bezier(0.23,1,0.32,1);
+      position: relative;
+    }
+    .goal-bar::after {
+      content: '';
+      position: absolute; right: 0; top: 0; bottom: 0; width: 20px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25));
+      animation: shimmer-bar 2s linear infinite;
+    }
+    @keyframes shimmer-bar {
+      0%  { opacity:0; }
+      50% { opacity:1; }
+      100%{ opacity:0; }
+    }
+    .goal-note { font-size: 0.73rem; color: var(--muted); margin-top: 0.3rem; }
+
+    .sustain-facts {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+    }
+    .sfact {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.4rem;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .sfact:hover { border-color: rgba(34,197,94,0.3); background:var(--surface2); }
+    .sfact-icon { font-size: 1.8rem; margin-bottom: 0.7rem; display: block; }
+    .sfact-val {
+      font-size: 1.5rem; font-weight: 900;
+      background: linear-gradient(135deg, var(--p2), var(--teal));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 0.25rem;
+    }
+    .sfact-label { font-size: 0.78rem; color: var(--muted2); line-height: 1.4; }
+
+    /* ════════════════════════════════════════════
+       INNOVATION
+    ════════════════════════════════════════════ */
+    #innovation {
+      background: var(--bg2);
+      max-width: none; padding: 0;
+    }
+    #innovation .inner {
+      padding: clamp(4rem,8vw,7rem) clamp(1.5rem,5vw,5rem);
+      max-width: 1300px; margin: 0 auto;
+    }
+
+    .innov-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+    @media (max-width:900px) { .innov-grid { grid-template-columns: 1fr; } }
+
+    .innov-main {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2.5rem;
+      position: relative; overflow: hidden;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .innov-main:hover {
+      border-color: rgba(34,197,94,0.3);
+      box-shadow: 0 16px 50px rgba(0,0,0,0.4);
+    }
+    .innov-main-bg {
+      position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(ellipse 80% 60% at 100% 0%, rgba(34,197,94,0.06), transparent 60%);
+    }
+    .innov-tag {
+      display: inline-block;
+      font-size: 0.68rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--p); background: rgba(34,197,94,0.1);
+      border: 1px solid rgba(34,197,94,0.25);
+      border-radius: 6px; padding: 3px 10px;
+      margin-bottom: 1rem;
+    }
+    .innov-main h3 {
+      font-size: 1.6rem; font-weight: 800;
+      margin-bottom: 0.8rem; line-height: 1.2;
+    }
+    .innov-main p { font-size: 0.9rem; color: var(--muted2); line-height: 1.7; }
+
+    .innov-side { display: flex; flex-direction: column; gap: 1.5rem; }
+    .innov-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      flex: 1;
+      transition: border-color 0.25s, background 0.25s, transform 0.25s, box-shadow 0.25s;
+    }
+    .innov-card:hover { border-color: rgba(34,197,94,0.25); background:var(--surface2); }
+    .innov-card h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .innov-card p  { font-size: 0.82rem; color: var(--muted2); line-height: 1.6; }
+
+    /* ════════════════════════════════════════════
+       GLOBAL PRESENCE
+    ════════════════════════════════════════════ */
+    .global-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.2rem;
+      margin-top: 3rem;
+    }
+    .region-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.8rem 1.5rem;
+      text-align: center;
+      transition: border-color 0.25s, background 0.25s, transform 0.25s, box-shadow 0.25s;
+      cursor: default;
+    }
+    .region-card:hover {
+      border-color: rgba(74,222,128,0.3);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 35px rgba(0,0,0,0.35);
+    }
+    .region-flag { font-size: 2.5rem; margin-bottom: 0.8rem; display: block; }
+    .region-name { font-size: 0.95rem; font-weight: 700; color: var(--text); margin-bottom: 0.3rem; }
+    .region-cities { font-size: 0.78rem; color: var(--muted2); line-height: 1.55; }
+
+    /* ════════════════════════════════════════════
+       QUOTE/MISSION BANNER
+    ════════════════════════════════════════════ */
+    #mission-banner {
+      background: linear-gradient(135deg, #0a1f0e 0%, #0d1a10 50%, #091808 100%);
+      border-top: 1px solid rgba(34,197,94,0.15);
+      border-bottom: 1px solid rgba(34,197,94,0.15);
+      max-width: none; padding: 0;
+    }
+    #mission-banner .inner {
+      max-width: 1300px; margin: 0 auto;
+      padding: clamp(3rem,6vw,5rem) clamp(1.5rem,5vw,5rem);
+      text-align: center;
+    }
+    .mission-quote {
+      font-size: clamp(1.4rem, 3.5vw, 2.2rem);
+      font-weight: 800; line-height: 1.3;
+      max-width: 800px; margin: 0 auto 1.5rem;
+    }
+    .mission-quote .hl-green {
+      color: var(--p2);
+    }
+    .mission-author { font-size: 0.85rem; color: var(--muted2); }
+
+    /* ════════════════════════════════════════════
+       CTA SECTION
+    ════════════════════════════════════════════ */
+    #cta-section {
+      max-width: none; padding: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(34,197,94,0.07), transparent 70%);
+    }
+    #cta-section .inner {
+      max-width: 1300px; margin: 0 auto;
+      padding: clamp(5rem,10vw,8rem) clamp(1.5rem,5vw,5rem);
+      text-align: center;
+    }
+    .cta-title {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 900; line-height: 1.1;
+      letter-spacing: -0.02em; margin-bottom: 1.2rem;
+    }
+    .cta-sub {
+      font-size: 1.1rem; color: var(--muted2);
+      max-width: 500px; margin: 0 auto 2.5rem;
+      line-height: 1.7;
+    }
+    .cta-actions {
+      display: flex; gap: 1rem;
+      justify-content: center; flex-wrap: wrap;
+    }
+
+    /* ════════════════════════════════════════════
+       FOOTER
+    ════════════════════════════════════════════ */
+    footer {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      /* iOS HIG: respect home indicator safe area */
+      padding: 3rem clamp(1.5rem,5vw,5rem) calc(2rem + env(safe-area-inset-bottom, 0));
+      padding-left:  max(clamp(1.5rem,5vw,5rem), env(safe-area-inset-left));
+      padding-right: max(clamp(1.5rem,5vw,5rem), env(safe-area-inset-right));
+    }
+    .footer-inner {
+      max-width: 1300px; margin: 0 auto;
+    }
+    .footer-top {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 3rem;
+      margin-bottom: 3rem;
+    }
+    @media (max-width:900px) {
+      .footer-top { grid-template-columns: 1fr 1fr; gap: 2rem; }
+    }
+    @media (max-width:560px) {
+      .footer-top { grid-template-columns: 1fr; }
+    }
+
+    .footer-brand .logo-name { font-size: 1.3rem; }
+    .footer-tagline { font-size: 0.85rem; color: var(--muted2); margin-top: 0.8rem; line-height: 1.65; max-width: 260px; }
+
+    .footer-col-title {
+      font-size: 0.72rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--muted); margin-bottom: 1rem;
+    }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 0.55rem; }
+    .footer-links a { font-size: 0.85rem; color: var(--muted2); text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--text); }
+
+    .footer-bottom {
+      border-top: 1px solid var(--border);
+      padding-top: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .footer-bottom .logo-name { font-size: 0.9rem; }
+
+    /* ════════════════════════════════════════════
+       TOUCH DEVICE — disable hover false-positives
+       (Emil principle: hover triggered on tap is wrong)
+    ════════════════════════════════════════════ */
+    @media (hover: none), (pointer: coarse) {
+      .deal-card:hover, .color-card:hover, .app-card:hover,
+      .usp-card:hover, .region-card:hover, .innov-card:hover,
+      .innov-main:hover, .sfact:hover, .stat-item:hover,
+      .pill:hover, .preset-btn:hover, .page-btn:hover,
+      .view-btn:hover, .wf-item:hover {
+        transform: none;
+        box-shadow: inherit;
+      }
+      .color-card:hover .color-swatch-orb {
+        transform: none;
+        filter: blur(12px);
+      }
+      .deal-card:hover .card-img { transform: none; }
+    }
+
+    /* ════════════════════════════════════════════
+       SCROLL PROGRESS BAR
+    ════════════════════════════════════════════ */
+    #scroll-progress {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      width: 0%;
+      z-index: 2000;
+      background: linear-gradient(90deg,
+        var(--red), var(--orange), var(--yellow),
+        var(--lime), var(--green), var(--teal),
+        var(--cyan), var(--blue), var(--purple));
+      transition: width 0.1s linear;
+      pointer-events: none;
+    }
+
+    /* ════════════════════════════════════════════
+       RIPPLE EFFECT
+    ════════════════════════════════════════════ */
+    .ripple-host { position: relative; overflow: hidden; }
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.25);
+      transform: scale(0);
+      animation: ripple-expand 0.55s cubic-bezier(0.25,1,0.5,1) forwards;
+      pointer-events: none;
+    }
+    @keyframes ripple-expand {
+      to { transform: scale(4); opacity: 0; }
+    }
+
+    /* ════════════════════════════════════════════
+       MAGNETIC BUTTON WRAPPER
+    ════════════════════════════════════════════ */
+    .magnetic-wrap { display: inline-block; }
+
+    /* ════════════════════════════════════════════
+       COLOR CARD BLOOM
+    ════════════════════════════════════════════ */
+    .color-card .color-swatch-orb {
+      transition: transform 0.4s cubic-bezier(0.23,1,0.32,1),
+                  filter 0.4s cubic-bezier(0.23,1,0.32,1);
+    }
+    .color-card:hover .color-swatch-orb {
+      transform: scale(1.35) translateY(-10%);
+      filter: blur(8px) brightness(1.3);
+    }
+
+    /* ════════════════════════════════════════════
+       HERO TITLE — @property gradient shimmer
+    ════════════════════════════════════════════ */
+    .hero-title .line-spectrum {
+      background: linear-gradient(var(--grad-angle),
+        var(--red), var(--orange), var(--yellow),
+        var(--green), var(--blue), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: grad-rotate 6s linear infinite;
+    }
+    @keyframes grad-rotate {
+      from { --grad-angle: 0deg;   }
+      to   { --grad-angle: 360deg; }
+    }
+
+    /* ════════════════════════════════════════════
+       STAT NUMBER — pulse on complete
+    ════════════════════════════════════════════ */
+    .stat-number.done {
+      animation: stat-pulse 0.4s cubic-bezier(0.23,1,0.32,1);
+    }
+    @keyframes stat-pulse {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    /* ════════════════════════════════════════════
+       NAV LINKS — sliding underline
+    ════════════════════════════════════════════ */
+    .nav-links a {
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -3px; left: 0;
+      width: 0%; height: 1px;
+      background: var(--p);
+      transition: width 0.25s cubic-bezier(0.23,1,0.32,1);
+    }
+    .nav-links a:hover::after { width: 100%; }
+
+    /* ════════════════════════════════════════════
+       SCROLL-DRIVEN PARALLAX (progressive enhance)
+    ════════════════════════════════════════════ */
+    @supports (animation-timeline: scroll()) {
+      .hero-content {
+        animation: hero-parallax linear both;
+        animation-timeline: scroll(root);
+        animation-range: 0px 600px;
+      }
+      @keyframes hero-parallax {
+        from { transform: translateY(0);    opacity: 1; }
+        to   { transform: translateY(80px); opacity: 0.3; }
+      }
+    }
+
+    /* ════════════════════════════════════════════
+       ACCESSIBILITY — prefers-reduced-motion
+       (Emil principle: fewer & gentler, not zero —
+        keep opacity/color, remove movement)
+    ════════════════════════════════════════════ */
+    @media (prefers-reduced-motion: reduce) {
+      /* Remove transform-based motion only */
+      .reveal, .reveal-left, .reveal-right {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: opacity 0.2s ease !important;
+      }
+      .hero-title, .hero-sub, .hero-eyebrow, .hero-actions, .hero-scroll,
+      header, .stat-item, .deal-card, .color-card, .app-card, .usp-card {
+        animation: none !important;
+        transform: none !important;
+      }
+      .about-orb, .logo-mark, .nav-logo-mark, .welcome-icon,
+      .scroll-arrow, .live-dot, .discount-bar::after, .goal-bar::after,
+      .spectrum-bar, .line-spectrum, .color-swatch-orb {
+        animation: none !important;
+      }
+      /* Disable hero parallax for reduced motion users */
+      .hero-content { animation: none !important; transform: none !important; }
+    }
+
+    /* ════════════════════════════════════════════
+       SCROLLBAR
+    ════════════════════════════════════════════ */
+    ::-webkit-scrollbar { width: 7px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: rgba(34,197,94,0.2); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(34,197,94,0.35); }
+
+    /* ════════════════════════════════════════════
+       RESPONSIVE HELPERS
+    ════════════════════════════════════════════ */
+    @media (max-width: 600px) {
+      .hero-title { font-size: 2.4rem; }
+      .color-grid { grid-template-columns: 1fr 1fr; }
+      .usp-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ════════════════════════════════════════════
+       iOS HIG — Touch targets 44pt minimum
+       (Apple Human Interface Guidelines)
+    ════════════════════════════════════════════ */
+    @media (pointer: coarse) {
+      .nav-cta, .preset-btn, .page-btn, .view-btn,
+      .footer-links a, .nav-links a, .pill,
+      .btn-primary, .btn-ghost {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .preset-btn, .pill { padding: 10px 14px; }
+      .page-btn { padding: 12px 0; }
+      .view-btn { padding: 12px 0; }
+      /* Touch-friendly spacing inside cards */
+      .card-body { padding: 1.2rem; gap: 0.7rem; }
+      .footer-links { gap: 0.85rem; }
+    }
+
+    /* ════════════════════════════════════════════
+       iOS HIG — Smooth momentum scrolling
+    ════════════════════════════════════════════ */
+    html, body { -webkit-overflow-scrolling: touch; }
+
+    /* ════════════════════════════════════════════
+       iOS HIG — Press feedback (scales children too)
+    ════════════════════════════════════════════ */
+    a, button, [role="button"] {
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Scroll progress -->
+<div id="scroll-progress"></div>
+
+<!-- ═══════════════════════════════════════════════════
+     NAVIGATION
+════════════════════════════════════════════════════ -->
+<nav id="nav">
+  <a class="nav-logo" href="#">
+    <div class="nav-logo-mark">GNT</div>
+    <div class="nav-logo-text">
+      <span class="nav-logo-name">GNT Group</span>
+      <span class="nav-logo-sub">Natural Color Pioneer</span>
+    </div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#about">Unternehmen</a></li>
+    <li><a href="#colors">EXBERRY®</a></li>
+    <li><a href="#applications">Anwendungen</a></li>
+    <li><a href="#sustainability">Nachhaltigkeit</a></li>
+    <li><a href="#global">Global</a></li>
+  </ul>
+  <a class="nav-cta" href="#cta-section">Kontakt aufnehmen</a>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════
+     HERO
+════════════════════════════════════════════════════ -->
+<section id="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-bg-glow"></div>
+
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      🌿 Seit 1978 · Pionier für pflanzliche Farben
+    </div>
+    <h1 class="hero-title">
+      <span class="line-green">Farben aus der Natur.</span><br>
+      <span style="color:var(--text)">Für die</span>
+      <span class="line-spectrum"> Welt von morgen.</span>
+    </h1>
+    <p class="hero-sub">
+      GNT Group ist der weltweit führende Hersteller pflanzlicher Lebensmittelfarben.
+      Mit EXBERRY® bringen wir die volle Kraft von Früchten, Gemüse und Pflanzen
+      in Speisen und Getränke — rein natürlich, nachhaltig und ohne künstliche Zusätze.
+    </p>
+    <div class="hero-actions">
+      <span class="magnetic-wrap">
+        <a href="#colors" class="btn-primary ripple-host" id="hero-cta">EXBERRY® entdecken</a>
+      </span>
+      <a href="#about" class="btn-ghost ripple-host">Unser Unternehmen</a>
+    </div>
+  </div>
+
+  <div class="hero-scroll">
+    <span>Scrollen</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<!-- Spectrum divider -->
+<div class="spectrum-bar"></div>
+
+<!-- ═══════════════════════════════════════════════════
+     STATS
+════════════════════════════════════════════════════ -->
+<section id="stats">
+  <div class="stats-inner">
+    <div class="stat-item reveal">
+      <div class="stat-number" data-count="1978" data-suffix="">1978</div>
+      <div class="stat-label">Gegründet</div>
+    </div>
+    <div class="stat-item reveal" style="transition-delay:0.1s">
+      <div class="stat-number" data-count="400" data-suffix="+">0</div>
+      <div class="stat-label">Farbprodukte</div>
+    </div>
+    <div class="stat-item reveal" style="transition-delay:0.2s">
+      <div class="stat-number" data-count="2000" data-suffix="+">0</div>
+      <div class="stat-label">Unternehmenskunden</div>
+    </div>
+    <div class="stat-item reveal" style="transition-delay:0.3s">
+      <div class="stat-number" data-count="75" data-suffix="+">0</div>
+      <div class="stat-label">Märkte weltweit</div>
+    </div>
+    <div class="stat-item reveal" style="transition-delay:0.4s">
+      <div class="stat-number" data-count="100" data-suffix="%">0</div>
+      <div class="stat-label">Pflanzliche Rohstoffe</div>
+    </div>
+  </div>
+</section>
+
+<!-- Spectrum divider -->
+<div class="spectrum-bar"></div>
+
+<!-- ═══════════════════════════════════════════════════
+     ABOUT
+════════════════════════════════════════════════════ -->
+<section id="about">
+  <div class="about-grid">
+
+    <div class="reveal-left">
+      <div class="section-label">Über uns</div>
+      <h2 class="section-title">
+        Familienunternehmen mit <span class="hl">globaler Wirkung</span>
+      </h2>
+      <p class="section-desc">
+        1978 in Aachen gegründet, hat sich die GNT Group zum weltweiten Marktführer
+        für pflanzliche Lebensmittelfarben entwickelt. Als unabhängiges Familienunternehmen
+        mit Hauptsitz in Mierlo, Niederlande, treffen wir Entscheidungen für die Zukunft —
+        nicht für das nächste Quartal.
+      </p>
+
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot">78</div>
+          <div class="timeline-body">
+            <div class="timeline-year">Gründung 1978</div>
+            <div class="timeline-text">Gründung in Aachen, Deutschland — mit der Vision, echte Naturfarben für die Lebensmittelindustrie zu entwickeln.</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot">↗</div>
+          <div class="timeline-body">
+            <div class="timeline-year">Internationale Expansion</div>
+            <div class="timeline-text">Aufbau eines globalen Netzwerks mit Büros in Europa, Nordamerika, Asien und dem Nahen Osten.</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot">EX</div>
+          <div class="timeline-body">
+            <div class="timeline-year">EXBERRY® — Weltmarktführer</div>
+            <div class="timeline-text">Mit über 400 Produkten und mehr als 2.000 Kunden weltweit ist EXBERRY® die globale Nr. 1 der Coloring Foods.</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot">🧬</div>
+          <div class="timeline-body">
+            <div class="timeline-year">Innovation: Fermentation</div>
+            <div class="timeline-text">Entwicklung neuer Farblösungen durch Fermentationstechnologie — nachhaltiger, effizienter, zukunftssicher.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="reveal-right">
+      <div class="about-visual">
+        <div class="about-orb orb-main"></div>
+        <div class="about-orb orb-red"></div>
+        <div class="about-orb orb-orange"></div>
+        <div class="about-orb orb-blue"></div>
+        <div class="about-orb orb-purple"></div>
+        <div class="about-orb orb-yellow"></div>
+        <div class="about-logo-center">
+          <div class="about-logo-circle">
+            <span class="about-logo-text">GNT</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     EXBERRY COLORS
+════════════════════════════════════════════════════ -->
+<section id="colors" id="colors-section" style="background:var(--bg2);max-width:none;padding:0;">
+<div style="max-width:1300px;margin:0 auto;padding:clamp(4rem,8vw,7rem) clamp(1.5rem,5vw,5rem);">
+
+  <div class="colors-header">
+    <div class="reveal">
+      <div class="section-label">Produkte</div>
+      <h2 class="section-title">
+        Das <span class="hl">volle Spektrum</span> der Natur
+      </h2>
+      <p class="section-desc">
+        EXBERRY® bietet über 400 Farblösungen — von leuchtendem Rot bis tiefem Blau-Violett.
+        Alle Farben entstehen ausschließlich aus Früchten, Gemüse und Pflanzen.
+      </p>
+    </div>
+    <div class="reveal" style="transition-delay:0.2s">
+      <div class="exberry-badge">EXBERRY<span class="r">®</span></div>
+    </div>
+  </div>
+
+  <div class="color-grid">
+    <div class="color-card reveal" style="transition-delay:0.05s">
+      <div class="color-swatch" style="background:#1a0808;">
+        <div class="color-swatch-orb" style="background:radial-gradient(circle, #ef4444, #b91c1c);"></div>
+      </div>
+      <div class="color-info"><div class="color-name">Kräftiges Rot</div><div class="color-source">Schwarze Karotte, Hibiskus</div></div>
+    </div>
+    <div class="color-card reveal" style="transition-delay:0.1s">
+      <div class="color-swatch" style="background:#1a0e06;">
+        <div class="color-swatch-orb" style="background:radial-gradient(circle, #f97316, #c2410c);"></div>
+      </div>
+      <div class="color-info"><div class="color-name">Leuchtendes Orange</div><div class="color-source">Kürbis, Karotte</div></div>
+    </div>
+    <div class="color-card reveal" style="transition-delay:0.15s">
+      <div class="color-swatch" style="background:#191300;">
+        <div class="color-swatch-orb" style="background:radial-gradient(circle, #eab308, #a16207);"></div>
+      </div>
+      <div class="color-info"><div class="color-name">Goldenes Gelb</div><div class="color-source">Safran, Kurkuma</div></div>
+    </div>
+    <div class="color-card reveal" style="transition-delay:0.2s">
+      <div class="color-swatch" style="background:#071509;">
+        <div class="color-swatch-orb" style="background:radial-gradient(circle, #22c55e, #15803d);"></div>
+      </div>
+      <div class="color-info"><div class="color-name">Frisches Grün</div><div class="color-source">Spinat, Spirulina</div></div>
+    </div>
+    <div class="color-card reveal" style="transition-delay:0.25s">
+      <div class="color-swatch" style="background:#03100e;">
+        <div class="color-swatch-orb" style="background:radial-gradient(circle, #14b8a6, #0f766e);"></div>
+      </div>
+      <div class="color-info"><div class="color-name">Türkis-Blau</div><div class="color-source">Spirulina, Algen</div></div>
+    </div>
+    <div class="color-card reveal" style="transition-delay:0.3s">
+      <div class="color-swatch" style="background:#030b18;">
+        <div class="color-swatch-orb" style="background:radial-gradient(circle, #3b82f6, #1d4ed8);"></div>
+      </div>
+      <div class="color-info"><div class="color-name">Tiefes Blau</div><div class="color-source">Blaubeere, Rotkohl</div></div>
+    </div>
+    <div class="color-card reveal" style="transition-delay:0.35s">
+      <div class="color-swatch" style="background:#0d0818;">
+        <div class="color-swatch-orb" style="background:radial-gradient(circle, #8b5cf6, #6d28d9);"></div>
+      </div>
+      <div class="color-info"><div class="color-name">Violett-Lila</div><div class="color-source">Schwarze Johannisbeere</div></div>
+    </div>
+    <div class="color-card reveal" style="transition-delay:0.4s">
+      <div class="color-swatch" style="background:#180612;">
+        <div class="color-swatch-orb" style="background:radial-gradient(circle, #ec4899, #be185d);"></div>
+      </div>
+      <div class="color-info"><div class="color-name">Lebhaftes Pink</div><div class="color-source">Rote Beete, Erdbeere</div></div>
+    </div>
+  </div>
+
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     APPLICATIONS
+════════════════════════════════════════════════════ -->
+<section id="applications">
+  <div class="reveal">
+    <div class="section-label">Anwendungen</div>
+    <h2 class="section-title">
+      Überall dort, wo <span class="hl">Farbe zählt</span>
+    </h2>
+    <p class="section-desc">
+      EXBERRY® Farben eignen sich für nahezu alle Lebensmittel- und Getränkeanwendungen —
+      von erfrischenden Getränken bis hin zu pflanzlichem Fleischersatz.
+    </p>
+  </div>
+
+  <div class="app-grid">
+    <div class="app-card reveal" style="--card-color:rgba(59,130,246,0.4);transition-delay:.05s">
+      <span class="app-icon">🥤</span>
+      <div class="app-name">Getränke</div>
+      <div class="app-desc">Softdrinks, Fruchtsäfte, Sportgetränke, alkoholische Getränke und Tees in brillanten Farbtönen.</div>
+    </div>
+    <div class="app-card reveal" style="--card-color:rgba(249,115,22,0.4);transition-delay:.1s">
+      <span class="app-icon">🍬</span>
+      <div class="app-name">Süßwaren</div>
+      <div class="app-desc">Bonbons, Gummibärchen, Schokolade und Zuckerwaren in leuchtenden, stabilen Naturfarben.</div>
+    </div>
+    <div class="app-card reveal" style="--card-color:rgba(234,179,8,0.4);transition-delay:.15s">
+      <span class="app-icon">🥐</span>
+      <div class="app-name">Backwaren</div>
+      <div class="app-desc">Kuchen, Kekse und Gebäck mit natürlichen Pastelltönen und kräftigen Farben.</div>
+    </div>
+    <div class="app-card reveal" style="--card-color:rgba(255,255,255,0.15);transition-delay:.2s">
+      <span class="app-icon">🥛</span>
+      <div class="app-name">Molkereiprodukte</div>
+      <div class="app-desc">Joghurt, Eiscreme, Käse und Desserts mit ansprechenden Naturfarben.</div>
+    </div>
+    <div class="app-card reveal" style="--card-color:rgba(132,204,22,0.4);transition-delay:.25s">
+      <span class="app-icon">🥗</span>
+      <div class="app-name">Snacks & Herzhaftes</div>
+      <div class="app-desc">Chips, Nüsse, Würzmittel und herzhafte Snacks mit natürlicher Farbe.</div>
+    </div>
+    <div class="app-card reveal" style="--card-color:rgba(239,68,68,0.4);transition-delay:.3s">
+      <span class="app-icon">🍔</span>
+      <div class="app-name">Plant-Based Fleisch</div>
+      <div class="app-desc">Pflanzliche Fleischalternativen mit realistischem Erscheinungsbild dank natürlicher Farbgebung.</div>
+    </div>
+    <div class="app-card reveal" style="--card-color:rgba(139,92,246,0.4);transition-delay:.35s">
+      <span class="app-icon">🐾</span>
+      <div class="app-name">Tiernahrung</div>
+      <div class="app-desc">Heimtiernahrung mit attraktivem Erscheinungsbild und natürlichen Zutaten.</div>
+    </div>
+    <div class="app-card reveal" style="--card-color:rgba(20,184,166,0.4);transition-delay:.4s">
+      <span class="app-icon">💊</span>
+      <div class="app-name">Nahrungsergänzung</div>
+      <div class="app-desc">Vitamine, Kapseln und Supplements mit pflanzlichen Farblösungen.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     WHY EXBERRY
+════════════════════════════════════════════════════ -->
+<section id="why-section" style="background:linear-gradient(180deg,var(--bg2) 0%,var(--bg) 100%);max-width:none;padding:0;">
+<div style="max-width:1300px;margin:0 auto;padding:clamp(4rem,8vw,7rem) clamp(1.5rem,5vw,5rem);">
+
+  <div class="reveal" style="text-align:center;max-width:600px;margin:0 auto 0.5rem;">
+    <div class="section-label" style="justify-content:center;">Warum EXBERRY®</div>
+    <h2 class="section-title" style="text-align:center;">
+      Der Unterschied, der <span class="hl">zählt</span>
+    </h2>
+    <p class="section-desc" style="margin:0 auto;">
+      EXBERRY® ist mehr als eine Farbe — es ist ein Versprechen an Verbraucher,
+      Hersteller und den Planeten.
+    </p>
+  </div>
+
+  <div class="usp-grid">
+    <div class="usp-card reveal" style="transition-delay:.05s">
+      <div class="usp-icon-wrap">🌿</div>
+      <div class="usp-title">100% Pflanzlich</div>
+      <div class="usp-text">Alle Farben stammen aus Früchten, Gemüse und Pflanzen. Keine künstlichen Farbstoffe, keine chemischen Lösungsmittel, keine Gentechnik.</div>
+    </div>
+    <div class="usp-card reveal" style="transition-delay:.1s">
+      <div class="usp-icon-wrap">🏷️</div>
+      <div class="usp-title">Clean Label</div>
+      <div class="usp-text">EXBERRY® Farben gelten in vielen Ländern als Lebensmittelzutat — nicht als Zusatzstoff. Ideal für verbraucherfreundliche Etiketten.</div>
+    </div>
+    <div class="usp-card reveal" style="transition-delay:.15s">
+      <div class="usp-icon-wrap">🔬</div>
+      <div class="usp-title">Physikalische Verarbeitung</div>
+      <div class="usp-text">Nur schonende Methoden: Pressen, Zerkleinern, Filtern. Keinerlei organische Lösungsmittel oder chemische Extraktion.</div>
+    </div>
+    <div class="usp-card reveal" style="transition-delay:.2s">
+      <div class="usp-icon-wrap">🎨</div>
+      <div class="usp-title">400+ Farbtöne</div>
+      <div class="usp-text">Das breiteste Portfolio an Naturfarben weltweit — von zartem Pastell bis zu leuchtenden Farbtönen über das gesamte Farbspektrum.</div>
+    </div>
+    <div class="usp-card reveal" style="transition-delay:.25s">
+      <div class="usp-icon-wrap">🌍</div>
+      <div class="usp-title">Global verfügbar</div>
+      <div class="usp-text">Lieferung in über 75 Märkte. Lokale Expertise mit globaler Reichweite — Büros auf 4 Kontinenten.</div>
+    </div>
+    <div class="usp-card reveal" style="transition-delay:.3s">
+      <div class="usp-icon-wrap">🤝</div>
+      <div class="usp-title">Verlässlicher Partner</div>
+      <div class="usp-text">Als Familienunternehmen seit 1978 denken wir in Generationen. Langfristige Partnerschaften statt kurzfristiger Gewinne.</div>
+    </div>
+  </div>
+
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SUSTAINABILITY
+════════════════════════════════════════════════════ -->
+<section id="sustainability">
+  <div class="reveal">
+    <div class="section-label">Nachhaltigkeit</div>
+    <h2 class="section-title">
+      Unsere Ziele <span class="hl">für 2030</span>
+    </h2>
+    <p class="section-desc">
+      Nachhaltigkeit ist kein Marketing — es ist unser Kernauftrag.
+      Wir haben uns ambitionierte Ziele gesetzt und arbeiten täglich daran.
+    </p>
+  </div>
+
+  <div class="sustain-grid">
+    <div class="sustain-goals reveal">
+      <div class="goal-item">
+        <div class="goal-header">
+          <span class="goal-name">🌱 Reduktion CO₂-Emissionen</span>
+          <span class="goal-target">−50% bis 2030</span>
+        </div>
+        <div class="goal-bar-track"><div class="goal-bar" data-width="68"></div></div>
+        <div class="goal-note">Aktueller Fortschritt: 68% des Ziels erreicht</div>
+      </div>
+      <div class="goal-item">
+        <div class="goal-header">
+          <span class="goal-name">💧 Wasserverbrauch senken</span>
+          <span class="goal-target">−30% bis 2030</span>
+        </div>
+        <div class="goal-bar-track"><div class="goal-bar" data-width="55"></div></div>
+        <div class="goal-note">Aktueller Fortschritt: 55% des Ziels erreicht</div>
+      </div>
+      <div class="goal-item">
+        <div class="goal-header">
+          <span class="goal-name">♻️ Kreislaufwirtschaft</span>
+          <span class="goal-target">Zero Waste bis 2030</span>
+        </div>
+        <div class="goal-bar-track"><div class="goal-bar" data-width="42"></div></div>
+        <div class="goal-note">Aktueller Fortschritt: 42% des Ziels erreicht</div>
+      </div>
+      <div class="goal-item">
+        <div class="goal-header">
+          <span class="goal-name">🌳 Nachhaltige Lieferkette</span>
+          <span class="goal-target">100% zertifiziert bis 2030</span>
+        </div>
+        <div class="goal-bar-track"><div class="goal-bar" data-width="78"></div></div>
+        <div class="goal-note">Aktueller Fortschritt: 78% des Ziels erreicht</div>
+      </div>
+    </div>
+
+    <div class="sustain-facts reveal" style="transition-delay:0.2s">
+      <div class="sfact">
+        <span class="sfact-icon">☀️</span>
+        <div class="sfact-val">100%</div>
+        <div class="sfact-label">Erneuerbare Energie in der Produktion</div>
+      </div>
+      <div class="sfact">
+        <span class="sfact-icon">🌾</span>
+        <div class="sfact-val">Non-GMO</div>
+        <div class="sfact-label">Alle Rohstoffe ohne Gentechnik</div>
+      </div>
+      <div class="sfact">
+        <span class="sfact-icon">🚫</span>
+        <div class="sfact-val">0</div>
+        <div class="sfact-label">Organische Lösungsmittel im Prozess</div>
+      </div>
+      <div class="sfact">
+        <span class="sfact-icon">🤲</span>
+        <div class="sfact-val">Fair</div>
+        <div class="sfact-label">Faire Handelsbedingungen mit Lieferanten</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Spectrum divider -->
+<div class="spectrum-bar"></div>
+
+<!-- ═══════════════════════════════════════════════════
+     INNOVATION
+════════════════════════════════════════════════════ -->
+<section id="innovation" style="background:var(--bg2);max-width:none;padding:0;">
+<div style="max-width:1300px;margin:0 auto;padding:clamp(4rem,8vw,7rem) clamp(1.5rem,5vw,5rem);">
+
+  <div class="reveal">
+    <div class="section-label">Innovation</div>
+    <h2 class="section-title">
+      Die Zukunft der <span class="hl">Naturfarben</span>
+    </h2>
+    <p class="section-desc">
+      Wir investieren kontinuierlich in Forschung und Entwicklung, um die
+      nächste Generation pflanzlicher Farblösungen zu erschaffen.
+    </p>
+  </div>
+
+  <div class="innov-grid">
+    <div class="innov-main reveal">
+      <div class="innov-main-bg"></div>
+      <div style="position:relative;z-index:1;">
+        <div class="innov-tag">🧬 Neueste Technologie</div>
+        <h3>Fermentation — die nächste Revolution</h3>
+        <p>
+          GNT entwickelt neue EXBERRY® Farblösungen durch innovative Fermentationstechnologie.
+          Dieser Durchbruch erweitert unser Farbspektrum erheblich und erhöht gleichzeitig
+          die Nachhaltigkeit unserer Produktion. Bestimmte Farbtöne, die aus traditionellen
+          Pflanzen schwer zu gewinnen sind, werden durch präzise Fermentation ermöglicht —
+          ohne Kompromisse bei Natürlichkeit oder Clean-Label-Standards.
+        </p>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:1.5rem;">
+          <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:8px;padding:0.5rem 1rem;font-size:0.78rem;color:var(--p);">
+            ✓ Größeres Farbspektrum
+          </div>
+          <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:8px;padding:0.5rem 1rem;font-size:0.78rem;color:var(--p);">
+            ✓ Höhere Stabilität
+          </div>
+          <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:8px;padding:0.5rem 1rem;font-size:0.78rem;color:var(--p);">
+            ✓ Geringerer Ressourcenverbrauch
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="innov-side">
+      <div class="innov-card reveal" style="transition-delay:0.15s">
+        <div style="font-size:1.8rem;margin-bottom:0.8rem;">🌈</div>
+        <h4>Erweiterte Farbpalette</h4>
+        <p>Kontinuierliche Entwicklung neuer Farbtöne — besonders im schwierigen blauen und violetten Spektrum aus rein pflanzlichen Quellen.</p>
+      </div>
+      <div class="innov-card reveal" style="transition-delay:0.25s">
+        <div style="font-size:1.8rem;margin-bottom:0.8rem;">⚗️</div>
+        <h4>Anwendungsforschung</h4>
+        <p>Unser globales F&E-Team entwickelt maßgeschneiderte Farblösungen für spezifische Produktanforderungen unserer Kunden.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     GLOBAL PRESENCE
+════════════════════════════════════════════════════ -->
+<section id="global">
+  <div class="reveal" style="text-align:center;max-width:600px;margin:0 auto;">
+    <div class="section-label" style="justify-content:center;">Globale Präsenz</div>
+    <h2 class="section-title" style="text-align:center;">
+      Lokal verwurzelt, <span class="hl">global vernetzt</span>
+    </h2>
+    <p class="section-desc" style="margin:0 auto;">
+      Mit Büros und Partnern auf 4 Kontinenten sind wir immer nah an unseren Kunden
+      und Lieferanten.
+    </p>
+  </div>
+
+  <div class="global-grid">
+    <div class="region-card reveal" style="transition-delay:.05s">
+      <span class="region-flag">🇳🇱</span>
+      <div class="region-name">Hauptsitz Europa</div>
+      <div class="region-cities">Mierlo, Niederlande<br>Kernmarkt · F&E · Produktion</div>
+    </div>
+    <div class="region-card reveal" style="transition-delay:.1s">
+      <span class="region-flag">🇩🇪</span>
+      <div class="region-name">Deutschland</div>
+      <div class="region-cities">Gründungsstandort Aachen<br>Europäisches Vertriebszentrum</div>
+    </div>
+    <div class="region-card reveal" style="transition-delay:.15s">
+      <span class="region-flag">🇺🇸</span>
+      <div class="region-name">Nordamerika</div>
+      <div class="region-cities">USA & Kanada<br>Starkes Wachstumsgebiet</div>
+    </div>
+    <div class="region-card reveal" style="transition-delay:.2s">
+      <span class="region-flag">🌏</span>
+      <div class="region-name">Asien-Pazifik</div>
+      <div class="region-cities">China, Japan, Australien<br>Expansionsmarkt mit eigenem Büro</div>
+    </div>
+    <div class="region-card reveal" style="transition-delay:.25s">
+      <span class="region-flag">🌍</span>
+      <div class="region-name">Naher Osten & Afrika</div>
+      <div class="region-cities">UAE, Saudi-Arabien<br>Wachsender Premiummarkt</div>
+    </div>
+    <div class="region-card reveal" style="transition-delay:.3s">
+      <span class="region-flag">🌎</span>
+      <div class="region-name">Lateinamerika</div>
+      <div class="region-cities">Brasilien, Mexiko<br>Emerging Markets</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     MISSION BANNER
+════════════════════════════════════════════════════ -->
+<section id="mission-banner" style="background:linear-gradient(135deg,#0a1f0e 0%,#0d1a10 50%,#091808 100%);border-top:1px solid rgba(34,197,94,0.15);border-bottom:1px solid rgba(34,197,94,0.15);max-width:none;padding:0;">
+<div style="max-width:1300px;margin:0 auto;padding:clamp(3rem,6vw,5rem) clamp(1.5rem,5vw,5rem);text-align:center;">
+  <div class="reveal">
+    <p class="mission-quote">
+      „Wir glauben, dass <span class="hl-green">natürliche Farben</span> die Zukunft der
+      Lebensmittelbranche sind — und dass es unsere Aufgabe ist, diese Zukunft
+      <span class="hl-green">möglich zu machen</span>."
+    </p>
+    <p class="mission-author">— GNT Group Unternehmensphilosophie · Seit 1978</p>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     CTA
+════════════════════════════════════════════════════ -->
+<section id="cta-section" style="max-width:none;padding:0;background:radial-gradient(ellipse 80% 60% at 50% 50%,rgba(34,197,94,0.07),transparent 70%);">
+<div style="max-width:1300px;margin:0 auto;padding:clamp(5rem,10vw,8rem) clamp(1.5rem,5vw,5rem);text-align:center;">
+  <div class="reveal">
+    <h2 class="cta-title">
+      Bereit für natürliche<br><span style="background:linear-gradient(135deg,var(--p2),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Farblösungen?</span>
+    </h2>
+    <p class="cta-sub">
+      Sprechen Sie mit unseren Experten. Wir finden die perfekte EXBERRY®
+      Lösung für Ihr Produkt.
+    </p>
+    <div class="cta-actions">
+      <a class="btn-primary" href="mailto:info@gnt-group.com">Jetzt Kontakt aufnehmen</a>
+      <a class="btn-ghost" href="https://exberry.com" target="_blank" rel="noopener">EXBERRY® Website →</a>
+    </div>
+    <p style="margin-top:1.5rem;font-size:0.8rem;color:var(--muted);">
+      GNT Group B.V. · Mierlo, Niederlande · info@gnt-group.com
+    </p>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:0.8rem;">
+          <div class="nav-logo-mark" style="width:36px;height:36px;font-size:0.9rem;">GNT</div>
+          <span class="nav-logo-name" style="font-size:1.1rem;">GNT Group</span>
+        </div>
+        <p class="footer-tagline">
+          Pionier für pflanzliche Lebensmittelfarben seit 1978.
+          Wir machen die Welt bunter — auf natürliche Weise.
+        </p>
+      </div>
+      <div>
+        <p class="footer-col-title">Produkte</p>
+        <ul class="footer-links">
+          <li><a href="#">EXBERRY® Farben</a></li>
+          <li><a href="#">Coloring Foods</a></li>
+          <li><a href="#">Farbspektrum</a></li>
+          <li><a href="#">Anwendungen</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="footer-col-title">Unternehmen</p>
+        <ul class="footer-links">
+          <li><a href="#">Über GNT</a></li>
+          <li><a href="#">Nachhaltigkeit</a></li>
+          <li><a href="#">Innovation</a></li>
+          <li><a href="#">Karriere</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="footer-col-title">Kontakt</p>
+        <ul class="footer-links">
+          <li><a href="#">Mierlo, Niederlande</a></li>
+          <li><a href="#">info@gnt-group.com</a></li>
+          <li><a href="#">Pressekontakt</a></li>
+          <li><a href="#">Impressum</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 GNT Group B.V. · Alle Rechte vorbehalten</span>
+      <span style="color:var(--muted2);">
+        <span class="nav-logo-name">GNT Group</span> · Natural Color Pioneer Since 1978
+      </span>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════════════ -->
+<script>
+/* ── Nav scroll effect ── */
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 30);
+}, { passive: true });
+
+/* ── Hero Canvas Particles ── */
+(function() {
+  const canvas = document.getElementById('hero-canvas');
+  const ctx = canvas.getContext('2d');
+
+  const COLORS = [
+    [239,68,68], [249,115,22], [234,179,8], [132,204,22],
+    [34,197,94], [20,184,166], [59,130,246], [139,92,246], [236,72,153]
+  ];
+
+  let W, H, particles;
+
+  function resize() {
+    W = canvas.width  = canvas.parentElement.offsetWidth;
+    H = canvas.height = canvas.parentElement.offsetHeight;
+  }
+
+  function createParticles(n) {
+    return Array.from({ length: n }, () => {
+      const c = COLORS[Math.floor(Math.random() * COLORS.length)];
+      return {
+        x: Math.random() * W, y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        r: Math.random() * 2.5 + 0.5,
+        a: Math.random() * 0.5 + 0.1,
+        c,
+      };
+    });
+  }
+
+  resize();
+  particles = createParticles(120);
+  window.addEventListener('resize', () => { resize(); particles = createParticles(120); }, { passive: true });
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    for (const p of particles) {
+      p.x = (p.x + p.vx + W) % W;
+      p.y = (p.y + p.vy + H) % H;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${p.c[0]},${p.c[1]},${p.c[2]},${p.a})`;
+      ctx.fill();
+    }
+    // Connections
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const d  = Math.hypot(dx, dy);
+        if (d < 110) {
+          const c = particles[i].c;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `rgba(${c[0]},${c[1]},${c[2]},${(1 - d / 110) * 0.08})`;
+          ctx.lineWidth = 0.8;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ── Intersection Observer (reveal) ── */
+const revealObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+
+      // Animate counters
+      if (e.target.classList.contains('stat-item')) {
+        const el = e.target.querySelector('[data-count]');
+        if (el && !el.dataset.animated) {
+          el.dataset.animated = '1';
+          animateCount(el);
+        }
+      }
+
+      // Animate goal bars
+      e.target.querySelectorAll('.goal-bar[data-width]').forEach(bar => {
+        if (!bar.dataset.animated) {
+          bar.dataset.animated = '1';
+          setTimeout(() => { bar.style.width = bar.dataset.width + '%'; }, 200);
+        }
+      });
+    }
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => revealObs.observe(el));
+
+/* ── Animated Counter (defined below with pulse) ── */
+
+/* ── Card tilt effect (only on hover-capable, fine-pointer, motion-OK) ── */
+const canHover     = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+if (canHover && !reducedMotion) {
+  document.querySelectorAll('.color-card, .usp-card, .app-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width  - 0.5;
+      const y = (e.clientY - r.top)  / r.height - 0.5;
+      card.style.transform = `translateY(-6px) rotateX(${-y * 6}deg) rotateY(${x * 6}deg) scale(1.02)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+      card.style.transition = 'transform 0.4s cubic-bezier(0.23,1,0.32,1), border-color 0.25s, box-shadow 0.25s';
+    });
+  });
+}
+
+/* ── Smooth scroll for nav links ── */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+
+/* ── Scroll Progress Bar ── */
+const progressBar = document.getElementById('scroll-progress');
+function updateProgress() {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  progressBar.style.width = Math.min((scrollTop / docHeight) * 100, 100) + '%';
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+
+/* ── Ripple Effect ── */
+document.querySelectorAll('.ripple-host').forEach(btn => {
+  btn.addEventListener('click', e => {
+    const r    = btn.getBoundingClientRect();
+    const size = Math.max(r.width, r.height);
+    const x    = e.clientX - r.left - size / 2;
+    const y    = e.clientY - r.top  - size / 2;
+    const rpl  = document.createElement('span');
+    rpl.className = 'ripple';
+    rpl.style.cssText = `width:${size}px;height:${size}px;left:${x}px;top:${y}px`;
+    btn.appendChild(rpl);
+    rpl.addEventListener('animationend', () => rpl.remove());
+  });
+});
+
+/* ── Magnetic Button ── */
+const magneticWrap = document.querySelector('.magnetic-wrap');
+const magneticBtn  = document.getElementById('hero-cta');
+if (magneticWrap && magneticBtn && window.matchMedia('(hover:hover)').matches
+    && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  magneticWrap.addEventListener('mousemove', e => {
+    const r  = magneticWrap.getBoundingClientRect();
+    const cx = r.left + r.width  / 2;
+    const cy = r.top  + r.height / 2;
+    const dx = (e.clientX - cx) * 0.35;
+    const dy = (e.clientY - cy) * 0.35;
+    magneticBtn.style.transform = `translate(${dx}px, ${dy}px)`;
+    magneticBtn.style.transition = 'transform 0.15s cubic-bezier(0.23,1,0.32,1)';
+  });
+  magneticWrap.addEventListener('mouseleave', () => {
+    magneticBtn.style.transform = '';
+    magneticBtn.style.transition = 'transform 0.4s cubic-bezier(0.23,1,0.32,1), opacity 0.2s, box-shadow 0.2s';
+  });
+}
+
+/* ── Animated Counter with pulse on completion ── */
+function animateCount(el) {
+  const target   = parseInt(el.dataset.count, 10);
+  const suffix   = el.dataset.suffix || '';
+  const start    = Date.now();
+  const duration = target > 1000 ? 1800 : 1400;
+  function step() {
+    const progress = Math.min((Date.now() - start) / duration, 1);
+    const eased    = 1 - Math.pow(1 - progress, 3);
+    const current  = Math.round(eased * target);
+    el.textContent = current.toLocaleString('de-DE') + suffix;
+    if (progress < 1) {
+      requestAnimationFrame(step);
+    } else {
+      el.textContent = target.toLocaleString('de-DE') + suffix;
+      el.classList.add('done');
+      el.addEventListener('animationend', () => el.classList.remove('done'), { once: true });
+    }
+  }
+  requestAnimationFrame(step);
+}
+</script>
+
+</body>
+</html>
