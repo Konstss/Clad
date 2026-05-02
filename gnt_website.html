@@ -43,6 +43,10 @@
       --purple: #8b5cf6; --pink:   #ec4899; --rose:   #f43f5e;
       --radius: 18px;
       --shadow: 0 20px 60px rgba(0,0,0,0.5);
+      /* Emil Kowalski recommended easing curves */
+      --ease-out:    cubic-bezier(0.23, 1, 0.32, 1);
+      --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+      --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
     }
 
     html { scroll-behavior: smooth; }
@@ -71,12 +75,12 @@
     .reveal {
       opacity: 0;
       transform: translateY(40px);
-      transition: opacity 0.8s cubic-bezier(.16,1,.3,1),
-                  transform 0.8s cubic-bezier(.16,1,.3,1);
+      transition: opacity 0.8s cubic-bezier(0.23,1,0.32,1),
+                  transform 0.8s cubic-bezier(0.23,1,0.32,1);
     }
     .reveal.visible { opacity: 1; transform: none; }
-    .reveal-left  { opacity: 0; transform: translateX(-50px); transition: opacity 0.8s cubic-bezier(.16,1,.3,1), transform 0.8s cubic-bezier(.16,1,.3,1); }
-    .reveal-right { opacity: 0; transform: translateX( 50px); transition: opacity 0.8s cubic-bezier(.16,1,.3,1), transform 0.8s cubic-bezier(.16,1,.3,1); }
+    .reveal-left  { opacity: 0; transform: translateX(-50px); transition: opacity 0.8s cubic-bezier(0.23,1,0.32,1), transform 0.8s cubic-bezier(0.23,1,0.32,1); }
+    .reveal-right { opacity: 0; transform: translateX( 50px); transition: opacity 0.8s cubic-bezier(0.23,1,0.32,1), transform 0.8s cubic-bezier(0.23,1,0.32,1); }
     .reveal-left.visible, .reveal-right.visible { opacity: 1; transform: none; }
 
     /* ════════════════════════════════════════════
@@ -155,9 +159,19 @@
       letter-spacing: 0.02em; font-family: inherit;
       text-decoration: none; display: inline-block;
     }
-    .nav-cta:hover {
-      opacity: 0.9; transform: translateY(-1px);
-      box-shadow: 0 6px 24px rgba(22,163,74,0.45);
+    @media (hover: hover) and (pointer: fine) {
+      .nav-cta:hover {
+        opacity: 0.9; transform: translateY(-1px);
+        box-shadow: 0 6px 24px rgba(22,163,74,0.45);
+      }
+    }
+    .nav-cta:active { transform: scale(0.97); transition-duration: 0.1s; }
+
+    /* All clickable elements get press feedback (Emil rule) */
+    .preset-btn:active, .page-btn:active, .view-btn:active,
+    .pill:active {
+      transform: scale(0.97);
+      transition-duration: 0.1s;
     }
 
     /* ════════════════════════════════════════════
@@ -192,7 +206,7 @@
       border: 1px solid rgba(34,197,94,0.25);
       border-radius: 20px; padding: 5px 16px;
       margin-bottom: 1.5rem;
-      animation: fadeDown 0.8s 0.1s cubic-bezier(.16,1,.3,1) both;
+      animation: fadeDown 0.8s 0.1s cubic-bezier(0.23,1,0.32,1) both;
     }
     @keyframes fadeDown {
       from { opacity:0; transform:translateY(-20px); }
@@ -204,7 +218,7 @@
       font-weight: 900; line-height: 1.05;
       letter-spacing: -0.025em;
       margin-bottom: 1.5rem;
-      animation: fadeUp 0.9s 0.2s cubic-bezier(.16,1,.3,1) both;
+      animation: fadeUp 0.9s 0.2s cubic-bezier(0.23,1,0.32,1) both;
     }
     @keyframes fadeUp {
       from { opacity:0; transform:translateY(35px); }
@@ -233,12 +247,12 @@
       color: var(--muted2); max-width: 620px;
       margin: 0 auto 2.5rem;
       line-height: 1.75;
-      animation: fadeUp 0.9s 0.35s cubic-bezier(.16,1,.3,1) both;
+      animation: fadeUp 0.9s 0.35s cubic-bezier(0.23,1,0.32,1) both;
     }
 
     .hero-actions {
       display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
-      animation: fadeUp 0.9s 0.5s cubic-bezier(.16,1,.3,1) both;
+      animation: fadeUp 0.9s 0.5s cubic-bezier(0.23,1,0.32,1) both;
     }
     .btn-primary {
       background: linear-gradient(135deg, var(--p3), var(--p));
@@ -250,7 +264,10 @@
       box-shadow: 0 6px 24px rgba(22,163,74,0.4);
       letter-spacing: 0.03em; font-family: inherit;
     }
-    .btn-primary:hover { opacity:.9; transform:translateY(-2px); box-shadow:0 10px 32px rgba(22,163,74,0.5); }
+    @media (hover: hover) and (pointer: fine) {
+      .btn-primary:hover { opacity:.9; transform:translateY(-2px); box-shadow:0 10px 32px rgba(22,163,74,0.5); }
+    }
+    .btn-primary:active { transform: scale(0.97); transition-duration: 0.1s; }
 
     .btn-ghost {
       background: var(--surface);
@@ -263,7 +280,10 @@
       letter-spacing: 0.03em; font-family: inherit;
       backdrop-filter: blur(8px);
     }
-    .btn-ghost:hover { background:var(--surface2); border-color:rgba(255,255,255,0.2); transform:translateY(-2px); }
+    @media (hover: hover) and (pointer: fine) {
+      .btn-ghost:hover { background:var(--surface2); border-color:rgba(255,255,255,0.2); transform:translateY(-2px); }
+    }
+    .btn-ghost:active { transform: scale(0.97); transition-duration: 0.1s; }
 
     .hero-scroll {
       position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
@@ -519,7 +539,7 @@
       border-radius: var(--radius);
       overflow: hidden;
       cursor: default;
-      transition: transform 0.3s cubic-bezier(.16,1,.3,1), box-shadow 0.3s;
+      transition: transform 0.3s cubic-bezier(0.23,1,0.32,1), box-shadow 0.3s;
       border: 1px solid var(--border);
     }
     .color-card:hover {
@@ -622,7 +642,7 @@
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 2rem;
-      transition: all 0.25s;
+      transition: border-color 0.25s, background 0.25s, transform 0.25s, box-shadow 0.25s;
     }
     .usp-card:hover {
       border-color: rgba(74,222,128,0.3);
@@ -674,7 +694,7 @@
       height: 100%; border-radius: 4px;
       background: linear-gradient(90deg, var(--p3), var(--p2));
       width: 0%;
-      transition: width 1.4s cubic-bezier(.16,1,.3,1);
+      transition: width 1.4s cubic-bezier(0.23,1,0.32,1);
       position: relative;
     }
     .goal-bar::after {
@@ -698,7 +718,7 @@
       border: 1px solid var(--border);
       border-radius: 14px;
       padding: 1.4rem;
-      transition: all 0.2s;
+      transition: border-color 0.2s, background 0.2s;
     }
     .sfact:hover { border-color: rgba(34,197,94,0.3); background:var(--surface2); }
     .sfact-icon { font-size: 1.8rem; margin-bottom: 0.7rem; display: block; }
@@ -768,7 +788,7 @@
       border-radius: var(--radius);
       padding: 1.5rem;
       flex: 1;
-      transition: all 0.25s;
+      transition: border-color 0.25s, background 0.25s, transform 0.25s, box-shadow 0.25s;
     }
     .innov-card:hover { border-color: rgba(34,197,94,0.25); background:var(--surface2); }
     .innov-card h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.4rem; }
@@ -789,7 +809,7 @@
       border-radius: var(--radius);
       padding: 1.8rem 1.5rem;
       text-align: center;
-      transition: all 0.25s;
+      transition: border-color 0.25s, background 0.25s, transform 0.25s, box-shadow 0.25s;
       cursor: default;
     }
     .region-card:hover {
@@ -902,6 +922,26 @@
     .footer-bottom .logo-name { font-size: 0.9rem; }
 
     /* ════════════════════════════════════════════
+       TOUCH DEVICE — disable hover false-positives
+       (Emil principle: hover triggered on tap is wrong)
+    ════════════════════════════════════════════ */
+    @media (hover: none), (pointer: coarse) {
+      .deal-card:hover, .color-card:hover, .app-card:hover,
+      .usp-card:hover, .region-card:hover, .innov-card:hover,
+      .innov-main:hover, .sfact:hover, .stat-item:hover,
+      .pill:hover, .preset-btn:hover, .page-btn:hover,
+      .view-btn:hover, .wf-item:hover {
+        transform: none;
+        box-shadow: inherit;
+      }
+      .color-card:hover .color-swatch-orb {
+        transform: none;
+        filter: blur(12px);
+      }
+      .deal-card:hover .card-img { transform: none; }
+    }
+
+    /* ════════════════════════════════════════════
        SCROLL PROGRESS BAR
     ════════════════════════════════════════════ */
     #scroll-progress {
@@ -943,8 +983,8 @@
        COLOR CARD BLOOM
     ════════════════════════════════════════════ */
     .color-card .color-swatch-orb {
-      transition: transform 0.4s cubic-bezier(0.16,1,0.3,1),
-                  filter 0.4s cubic-bezier(0.16,1,0.3,1);
+      transition: transform 0.4s cubic-bezier(0.23,1,0.32,1),
+                  filter 0.4s cubic-bezier(0.23,1,0.32,1);
     }
     .color-card:hover .color-swatch-orb {
       transform: scale(1.35) translateY(-10%);
@@ -972,7 +1012,7 @@
        STAT NUMBER — pulse on complete
     ════════════════════════════════════════════ */
     .stat-number.done {
-      animation: stat-pulse 0.4s cubic-bezier(0.16,1,0.3,1);
+      animation: stat-pulse 0.4s cubic-bezier(0.23,1,0.32,1);
     }
     @keyframes stat-pulse {
       0%   { transform: scale(1); }
@@ -992,7 +1032,7 @@
       bottom: -3px; left: 0;
       width: 0%; height: 1px;
       background: var(--p);
-      transition: width 0.25s cubic-bezier(0.16,1,0.3,1);
+      transition: width 0.25s cubic-bezier(0.23,1,0.32,1);
     }
     .nav-links a:hover::after { width: 100%; }
 
@@ -1013,17 +1053,28 @@
 
     /* ════════════════════════════════════════════
        ACCESSIBILITY — prefers-reduced-motion
+       (Emil principle: fewer & gentler, not zero —
+        keep opacity/color, remove movement)
     ════════════════════════════════════════════ */
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-      }
+      /* Remove transform-based motion only */
       .reveal, .reveal-left, .reveal-right {
         opacity: 1 !important;
         transform: none !important;
+        transition: opacity 0.2s ease !important;
       }
+      .hero-title, .hero-sub, .hero-eyebrow, .hero-actions, .hero-scroll,
+      header, .stat-item, .deal-card, .color-card, .app-card, .usp-card {
+        animation: none !important;
+        transform: none !important;
+      }
+      .about-orb, .logo-mark, .nav-logo-mark, .welcome-icon,
+      .scroll-arrow, .live-dot, .discount-bar::after, .goal-bar::after,
+      .spectrum-bar, .line-spectrum, .color-swatch-orb {
+        animation: none !important;
+      }
+      /* Disable hero parallax for reduced motion users */
+      .hero-content { animation: none !important; transform: none !important; }
     }
 
     /* ════════════════════════════════════════════
@@ -1784,19 +1835,24 @@ document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => 
 
 /* ── Animated Counter (defined below with pulse) ── */
 
-/* ── Card tilt effect (subtle 3D) ── */
-document.querySelectorAll('.color-card, .usp-card, .app-card').forEach(card => {
-  card.addEventListener('mousemove', e => {
-    const r   = card.getBoundingClientRect();
-    const x   = (e.clientX - r.left) / r.width  - 0.5;
-    const y   = (e.clientY - r.top)  / r.height - 0.5;
-    card.style.transform = `translateY(-6px) rotateX(${-y * 6}deg) rotateY(${x * 6}deg) scale(1.02)`;
+/* ── Card tilt effect (only on hover-capable, fine-pointer, motion-OK) ── */
+const canHover     = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+if (canHover && !reducedMotion) {
+  document.querySelectorAll('.color-card, .usp-card, .app-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width  - 0.5;
+      const y = (e.clientY - r.top)  / r.height - 0.5;
+      card.style.transform = `translateY(-6px) rotateX(${-y * 6}deg) rotateY(${x * 6}deg) scale(1.02)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+      card.style.transition = 'transform 0.4s cubic-bezier(0.23,1,0.32,1), border-color 0.25s, box-shadow 0.25s';
+    });
   });
-  card.addEventListener('mouseleave', () => {
-    card.style.transform = '';
-    card.style.transition = 'transform 0.4s ease, border-color 0.25s, box-shadow 0.25s';
-  });
-});
+}
 
 /* ── Smooth scroll for nav links ── */
 document.querySelectorAll('a[href^="#"]').forEach(a => {
@@ -1836,7 +1892,8 @@ document.querySelectorAll('.ripple-host').forEach(btn => {
 /* ── Magnetic Button ── */
 const magneticWrap = document.querySelector('.magnetic-wrap');
 const magneticBtn  = document.getElementById('hero-cta');
-if (magneticWrap && magneticBtn && window.matchMedia('(hover:hover)').matches) {
+if (magneticWrap && magneticBtn && window.matchMedia('(hover:hover)').matches
+    && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
   magneticWrap.addEventListener('mousemove', e => {
     const r  = magneticWrap.getBoundingClientRect();
     const cx = r.left + r.width  / 2;
@@ -1844,11 +1901,11 @@ if (magneticWrap && magneticBtn && window.matchMedia('(hover:hover)').matches) {
     const dx = (e.clientX - cx) * 0.35;
     const dy = (e.clientY - cy) * 0.35;
     magneticBtn.style.transform = `translate(${dx}px, ${dy}px)`;
-    magneticBtn.style.transition = 'transform 0.15s cubic-bezier(0.16,1,0.3,1)';
+    magneticBtn.style.transition = 'transform 0.15s cubic-bezier(0.23,1,0.32,1)';
   });
   magneticWrap.addEventListener('mouseleave', () => {
     magneticBtn.style.transform = '';
-    magneticBtn.style.transition = 'transform 0.4s cubic-bezier(0.16,1,0.3,1), opacity 0.2s, box-shadow 0.2s';
+    magneticBtn.style.transition = 'transform 0.4s cubic-bezier(0.23,1,0.32,1), opacity 0.2s, box-shadow 0.2s';
   });
 }
 
