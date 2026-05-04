@@ -1,160 +1,169 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smart Haus – Vorschau</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: #1a1a2e;
-      color: #eee;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    h1 {
-      font-size: 2rem;
-      color: #e94560;
-      margin-bottom: 6px;
-      letter-spacing: 1px;
-    }
-    .subtitle {
-      color: #888;
-      margin-bottom: 40px;
-      font-size: 0.9rem;
-    }
-    .grid {
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-      width: 100%;
-      max-width: 420px;
-    }
-    .card {
-      background: #16213e;
-      border-radius: 16px;
-      padding: 22px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-      transition: transform 0.1s;
-    }
-    .card:hover { transform: translateY(-2px); }
-    .card-left { display: flex; align-items: center; gap: 14px; }
-    .icon { font-size: 2rem; line-height: 1; transition: filter 0.3s; }
-    .icon.on { filter: drop-shadow(0 0 8px #f5a623); }
-    .card-info h2 { font-size: 1.1rem; margin-bottom: 3px; }
-    .status { font-size: 0.82rem; color: #666; }
-    .status.on { color: #f5a623; font-weight: 600; }
-    .toggle { position: relative; width: 60px; height: 32px; flex-shrink: 0; }
-    .toggle input { opacity: 0; width: 0; height: 0; }
-    .slider {
-      position: absolute;
-      inset: 0;
-      background: #333;
-      border-radius: 32px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    .slider:before {
-      content: '';
-      position: absolute;
-      width: 24px; height: 24px;
-      left: 4px; top: 4px;
-      background: #fff;
-      border-radius: 50%;
-      transition: transform 0.3s;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    }
-    input:checked + .slider { background: #f5a623; }
-    input:checked + .slider:before { transform: translateX(28px); }
-    .footer {
-      margin-top: 40px;
-      color: #444;
-      font-size: 0.75rem;
-    }
-    .preview-badge {
-      position: fixed;
-      top: 12px;
-      right: 12px;
-      background: #e94560;
-      color: #fff;
-      font-size: 0.7rem;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-family: monospace;
-      letter-spacing: 0.5px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Smart Haus</title>
+<style>
+:root{--eg:#f59e0b;--og1:#3b82f6;--og2:#8b5cf6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#060614;color:#e2e8f0;min-height:100vh;padding-bottom:40px}
+body::before,body::after{content:'';position:fixed;border-radius:50%;filter:blur(120px);z-index:0;pointer-events:none}
+body::before{width:600px;height:600px;background:rgba(59,130,246,.07);top:-200px;left:-200px}
+body::after{width:500px;height:500px;background:rgba(139,92,246,.07);bottom:-100px;right:-100px}
+header{position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);background:rgba(6,6,20,.85);border-bottom:1px solid rgba(255,255,255,.07);padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:1.4rem;font-weight:700;letter-spacing:.5px;color:#fff}
+.logo span{color:#f59e0b}
+.badge{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:5px 14px;font-size:.8rem;color:#94a3b8}
+.badge b{color:#fff}
+.preview-tag{position:fixed;bottom:16px;right:16px;background:#e94560;color:#fff;font-size:.65rem;padding:4px 10px;border-radius:12px;font-family:monospace;z-index:999;letter-spacing:.5px}
+main{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:28px 16px;display:flex;flex-direction:column;gap:28px}
+.floor{border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.025)}
+.floor-header{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.06)}
+.floor-pill{font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.5px;border:1px solid currentColor;flex-shrink:0}
+.floor-title{font-size:1rem;font-weight:600;color:#cbd5e1;flex:1}
+.floor-count{font-size:.78rem;color:#64748b;flex-shrink:0}
+.floor-btns{display:flex;gap:6px;flex-shrink:0}
+.floor-btns button{font-size:.72rem;padding:5px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#94a3b8;cursor:pointer;transition:.2s}
+.floor-btns button:hover{background:rgba(255,255,255,.1);color:#fff}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;padding:16px}
+.card{border-radius:14px;padding:16px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;align-items:center;gap:8px;transition:all .3s}
+.card.on{border-color:var(--fc);box-shadow:0 0 28px color-mix(in srgb,var(--fc) 25%,transparent)}
+.card-icon{font-size:2rem;transition:filter .3s}
+.card.on .card-icon{filter:drop-shadow(0 0 10px var(--fc))}
+.card-name{font-size:.78rem;color:#94a3b8;text-align:center;font-weight:500;line-height:1.3}
+.card-status{font-size:.7rem;padding:2px 10px;border-radius:10px;background:rgba(255,255,255,.05);color:#475569;transition:all .3s}
+.card.on .card-status{background:color-mix(in srgb,var(--fc) 15%,transparent);color:var(--fc);font-weight:600}
+.toggle{position:relative;width:46px;height:26px;flex-shrink:0;margin-top:4px}
+.toggle input{opacity:0;width:0;height:0}
+.slider{position:absolute;inset:0;background:#1e2a3a;border-radius:26px;cursor:pointer;transition:.3s;border:1px solid rgba(255,255,255,.1)}
+.slider:before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#475569;border-radius:50%;transition:.3s}
+input:checked+.slider{background:var(--fc);border-color:var(--fc)}
+input:checked+.slider:before{transform:translateX(20px);background:#fff}
+footer{text-align:center;color:#1e293b;font-size:.72rem;margin-top:12px;position:relative;z-index:1}
+@media(max-width:520px){
+  .floor-header{flex-wrap:wrap}
+  .floor-btns{width:100%}
+  .floor-btns button{flex:1}
+  .cards{grid-template-columns:repeat(2,1fr)}
+  header{gap:8px}
+}
+</style>
 </head>
 <body>
-  <span class="preview-badge">VORSCHAU</span>
 
-  <h1>&#127968; Smart Haus</h1>
-  <p class="subtitle">Beleuchtungssteuerung</p>
+<header>
+  <div class="logo">&#127968; Smart <span>Haus</span></div>
+  <div class="badge"><b id="totalOn">0</b> / 20 Lichter an</div>
+</header>
 
-  <div class="grid" id="grid">
-    <div class="card">
-      <div class="card-left">
-        <span class="icon" id="icon1">&#128161;</span>
-        <div class="card-info">
-          <h2>Licht 1</h2>
-          <p class="status" id="status1">Aus</p>
-        </div>
+<main>
+
+  <!-- EG -->
+  <section class="floor" id="floor0">
+    <div class="floor-header">
+      <span class="floor-pill" style="color:#f59e0b">EG</span>
+      <span class="floor-title">Erdgeschoss</span>
+      <span class="floor-count" id="fc0">0/7 an</span>
+      <div class="floor-btns">
+        <button onclick="floorAll(0,true)">Alle AN</button>
+        <button onclick="floorAll(0,false)">Alle AUS</button>
       </div>
-      <label class="toggle">
-        <input type="checkbox" id="cb1" onchange="toggle(1)">
-        <span class="slider"></span>
-      </label>
     </div>
+    <div class="cards">
+      <div class="card" id="c0" style="--fc:#f59e0b"><div class="card-icon">&#128715;</div><div class="card-name">Wohnzimmer</div><div class="card-status" id="s0">Aus</div><label class="toggle"><input type="checkbox" id="b0" onchange="toggle(0)"><span class="slider"></span></label></div>
+      <div class="card" id="c1" style="--fc:#f59e0b"><div class="card-icon">&#127859;</div><div class="card-name">Küche</div><div class="card-status" id="s1">Aus</div><label class="toggle"><input type="checkbox" id="b1" onchange="toggle(1)"><span class="slider"></span></label></div>
+      <div class="card" id="c2" style="--fc:#f59e0b"><div class="card-icon">&#127869;</div><div class="card-name">Esszimmer</div><div class="card-status" id="s2">Aus</div><label class="toggle"><input type="checkbox" id="b2" onchange="toggle(2)"><span class="slider"></span></label></div>
+      <div class="card" id="c3" style="--fc:#f59e0b"><div class="card-icon">&#128682;</div><div class="card-name">Flur EG</div><div class="card-status" id="s3">Aus</div><label class="toggle"><input type="checkbox" id="b3" onchange="toggle(3)"><span class="slider"></span></label></div>
+      <div class="card" id="c4" style="--fc:#f59e0b"><div class="card-icon">&#128703;</div><div class="card-name">Bad EG</div><div class="card-status" id="s4">Aus</div><label class="toggle"><input type="checkbox" id="b4" onchange="toggle(4)"><span class="slider"></span></label></div>
+      <div class="card" id="c5" style="--fc:#f59e0b"><div class="card-icon">&#128663;</div><div class="card-name">Garage</div><div class="card-status" id="s5">Aus</div><label class="toggle"><input type="checkbox" id="b5" onchange="toggle(5)"><span class="slider"></span></label></div>
+      <div class="card" id="c6" style="--fc:#f59e0b"><div class="card-icon">&#127807;</div><div class="card-name">Garten</div><div class="card-status" id="s6">Aus</div><label class="toggle"><input type="checkbox" id="b6" onchange="toggle(6)"><span class="slider"></span></label></div>
+    </div>
+  </section>
 
-    <div class="card">
-      <div class="card-left">
-        <span class="icon" id="icon2">&#128161;</span>
-        <div class="card-info">
-          <h2>Licht 2</h2>
-          <p class="status" id="status2">Aus</p>
-        </div>
+  <!-- 1.OG -->
+  <section class="floor" id="floor1">
+    <div class="floor-header">
+      <span class="floor-pill" style="color:#3b82f6">1.OG</span>
+      <span class="floor-title">1. Obergeschoss</span>
+      <span class="floor-count" id="fc1">0/7 an</span>
+      <div class="floor-btns">
+        <button onclick="floorAll(1,true)">Alle AN</button>
+        <button onclick="floorAll(1,false)">Alle AUS</button>
       </div>
-      <label class="toggle">
-        <input type="checkbox" id="cb2" onchange="toggle(2)">
-        <span class="slider"></span>
-      </label>
     </div>
+    <div class="cards">
+      <div class="card" id="c7"  style="--fc:#3b82f6"><div class="card-icon">&#128717;</div><div class="card-name">Schlafzimmer</div><div class="card-status" id="s7">Aus</div><label class="toggle"><input type="checkbox" id="b7"  onchange="toggle(7)"><span class="slider"></span></label></div>
+      <div class="card" id="c8"  style="--fc:#3b82f6"><div class="card-icon">&#129528;</div><div class="card-name">Kinderzimmer 1</div><div class="card-status" id="s8">Aus</div><label class="toggle"><input type="checkbox" id="b8"  onchange="toggle(8)"><span class="slider"></span></label></div>
+      <div class="card" id="c9"  style="--fc:#3b82f6"><div class="card-icon">&#129528;</div><div class="card-name">Kinderzimmer 2</div><div class="card-status" id="s9">Aus</div><label class="toggle"><input type="checkbox" id="b9"  onchange="toggle(9)"><span class="slider"></span></label></div>
+      <div class="card" id="c10" style="--fc:#3b82f6"><div class="card-icon">&#128187;</div><div class="card-name">Büro</div><div class="card-status" id="s10">Aus</div><label class="toggle"><input type="checkbox" id="b10" onchange="toggle(10)"><span class="slider"></span></label></div>
+      <div class="card" id="c11" style="--fc:#3b82f6"><div class="card-icon">&#128703;</div><div class="card-name">Bad 1.OG</div><div class="card-status" id="s11">Aus</div><label class="toggle"><input type="checkbox" id="b11" onchange="toggle(11)"><span class="slider"></span></label></div>
+      <div class="card" id="c12" style="--fc:#3b82f6"><div class="card-icon">&#128131;</div><div class="card-name">Ankleide</div><div class="card-status" id="s12">Aus</div><label class="toggle"><input type="checkbox" id="b12" onchange="toggle(12)"><span class="slider"></span></label></div>
+      <div class="card" id="c13" style="--fc:#3b82f6"><div class="card-icon">&#128682;</div><div class="card-name">Flur 1.OG</div><div class="card-status" id="s13">Aus</div><label class="toggle"><input type="checkbox" id="b13" onchange="toggle(13)"><span class="slider"></span></label></div>
+    </div>
+  </section>
 
-    <div class="card">
-      <div class="card-left">
-        <span class="icon" id="icon3">&#128161;</span>
-        <div class="card-info">
-          <h2>Licht 3</h2>
-          <p class="status" id="status3">Aus</p>
-        </div>
+  <!-- 2.OG -->
+  <section class="floor" id="floor2">
+    <div class="floor-header">
+      <span class="floor-pill" style="color:#8b5cf6">2.OG</span>
+      <span class="floor-title">2. Obergeschoss</span>
+      <span class="floor-count" id="fc2">0/6 an</span>
+      <div class="floor-btns">
+        <button onclick="floorAll(2,true)">Alle AN</button>
+        <button onclick="floorAll(2,false)">Alle AUS</button>
       </div>
-      <label class="toggle">
-        <input type="checkbox" id="cb3" onchange="toggle(3)">
-        <span class="slider"></span>
-      </label>
     </div>
-  </div>
+    <div class="cards">
+      <div class="card" id="c14" style="--fc:#8b5cf6"><div class="card-icon">&#128717;</div><div class="card-name">Gästezimmer</div><div class="card-status" id="s14">Aus</div><label class="toggle"><input type="checkbox" id="b14" onchange="toggle(14)"><span class="slider"></span></label></div>
+      <div class="card" id="c15" style="--fc:#8b5cf6"><div class="card-icon">&#127947;</div><div class="card-name">Fitness</div><div class="card-status" id="s15">Aus</div><label class="toggle"><input type="checkbox" id="b15" onchange="toggle(15)"><span class="slider"></span></label></div>
+      <div class="card" id="c16" style="--fc:#8b5cf6"><div class="card-icon">&#128703;</div><div class="card-name">Bad 2.OG</div><div class="card-status" id="s16">Aus</div><label class="toggle"><input type="checkbox" id="b16" onchange="toggle(16)"><span class="slider"></span></label></div>
+      <div class="card" id="c17" style="--fc:#8b5cf6"><div class="card-icon">&#128230;</div><div class="card-name">Dachboden</div><div class="card-status" id="s17">Aus</div><label class="toggle"><input type="checkbox" id="b17" onchange="toggle(17)"><span class="slider"></span></label></div>
+      <div class="card" id="c18" style="--fc:#8b5cf6"><div class="card-icon">&#9728;</div><div class="card-name">Terrasse</div><div class="card-status" id="s18">Aus</div><label class="toggle"><input type="checkbox" id="b18" onchange="toggle(18)"><span class="slider"></span></label></div>
+      <div class="card" id="c19" style="--fc:#8b5cf6"><div class="card-icon">&#128682;</div><div class="card-name">Flur 2.OG</div><div class="card-status" id="s19">Aus</div><label class="toggle"><input type="checkbox" id="b19" onchange="toggle(19)"><span class="slider"></span></label></div>
+    </div>
+  </section>
 
-  <p class="footer">ESP32 &bull; IP: 192.168.4.1</p>
+</main>
 
-  <script>
-    function toggle(relay) {
-      var cb     = document.getElementById('cb' + relay);
-      var status = document.getElementById('status' + relay);
-      var icon   = document.getElementById('icon' + relay);
-      var on     = cb.checked;
-      status.textContent = on ? 'An' : 'Aus';
-      status.className   = 'status' + (on ? ' on' : '');
-      icon.className     = 'icon'   + (on ? ' on' : '');
-    }
-  </script>
+<footer>ESP32 &bull; 192.168.4.1</footer>
+<span class="preview-tag">VORSCHAU</span>
+
+<script>
+var states = new Array(20).fill(false);
+var FLOOR_START = [0, 7, 14];
+var FLOOR_COUNT = [7, 7, 6];
+
+function updateCard(id, on) {
+  var card = document.getElementById('c' + id);
+  var st   = document.getElementById('s' + id);
+  var cb   = document.getElementById('b' + id);
+  states[id] = on;
+  cb.checked = on;
+  card.classList.toggle('on', on);
+  st.textContent = on ? 'An' : 'Aus';
+  updateCounts();
+}
+
+function updateCounts() {
+  var total = states.filter(Boolean).length;
+  document.getElementById('totalOn').textContent = total;
+  for (var f = 0; f < 3; f++) {
+    var on = 0;
+    for (var i = FLOOR_START[f]; i < FLOOR_START[f] + FLOOR_COUNT[f]; i++)
+      if (states[i]) on++;
+    document.getElementById('fc' + f).textContent = on + '/' + FLOOR_COUNT[f] + ' an';
+  }
+}
+
+function toggle(id) {
+  updateCard(id, document.getElementById('b' + id).checked);
+}
+
+function floorAll(floor, state) {
+  for (var i = FLOOR_START[floor]; i < FLOOR_START[floor] + FLOOR_COUNT[floor]; i++)
+    updateCard(i, state);
+}
+</script>
 </body>
 </html>
