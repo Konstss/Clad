@@ -127,9 +127,15 @@
 
     .nav-logo {
       display: flex;
-      align-items: center;
-      gap: 12px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0;
       text-decoration: none;
+    }
+    .nav-exberry-logo {
+      height: 30px;
+      width: auto;
+      display: block;
     }
     .nav-logo-mark {
       width: 42px; height: 42px;
@@ -1163,11 +1169,8 @@
 ════════════════════════════════════════════════════ -->
 <nav id="nav">
   <a class="nav-logo" href="#">
-    <div class="nav-logo-mark">GNT</div>
-    <div class="nav-logo-text">
-      <span class="nav-logo-name">GNT Group</span>
-      <span class="nav-logo-sub">Natural Color Pioneer</span>
-    </div>
+    <img src="exberry-logo.svg" alt="EXBERRY®" class="nav-exberry-logo">
+    <span class="nav-logo-sub" style="display:block;margin-top:1px;font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted2);">by GNT Group</span>
   </a>
   <ul class="nav-links">
     <li><a href="#about">Unternehmen</a></li>
@@ -1335,7 +1338,7 @@
       </p>
     </div>
     <div class="reveal" style="transition-delay:0.2s">
-      <div class="exberry-badge">EXBERRY<span class="r">®</span></div>
+      <img src="exberry-logo.svg" alt="EXBERRY®" style="height:52px;width:auto;display:block;">
     </div>
   </div>
 
@@ -1740,9 +1743,9 @@
   <div class="footer-inner">
     <div class="footer-top">
       <div class="footer-brand">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:0.8rem;">
-          <div class="nav-logo-mark" style="width:36px;height:36px;font-size:0.9rem;">GNT</div>
-          <span class="nav-logo-name" style="font-size:1.1rem;">GNT Group</span>
+        <div style="margin-bottom:0.8rem;">
+          <img src="exberry-logo.svg" alt="EXBERRY®" style="height:36px;width:auto;display:block;">
+          <span style="display:block;margin-top:4px;font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted2);">by GNT Group</span>
         </div>
         <p class="footer-tagline">
           Pionier für pflanzliche Lebensmittelfarben seit 1978.
