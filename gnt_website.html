@@ -79,8 +79,9 @@
     #hero-canvas {
       position: absolute;
       inset: 0;
-      z-index: 0;
+      z-index: 1;
       pointer-events: none;
+      mix-blend-mode: screen;
     }
 
     /* ════════════════════════════════════════════
@@ -214,7 +215,7 @@
         radial-gradient(ellipse 45% 35% at 80% 70%, rgba(20,184,166,0.08) 0%, transparent 50%);
     }
 
-    .hero-content { position: relative; z-index: 1; max-width: 920px; }
+    .hero-content { position: relative; z-index: 2; max-width: 920px; }
 
     .hero-eyebrow {
       display: inline-flex; align-items: center; gap: 8px;
@@ -1795,72 +1796,154 @@ window.addEventListener('scroll', () => {
   nav.classList.toggle('scrolled', window.scrollY > 30);
 }, { passive: true });
 
-/* ── Hero Canvas Particles ── */
+/* ── Hero Canvas: WebGL Domain-Warped Fluid Dye ── */
 (function() {
   const canvas = document.getElementById('hero-canvas');
-  const ctx = canvas.getContext('2d');
+  const noMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const COLORS = [
-    [239,68,68], [249,115,22], [234,179,8], [132,204,22],
-    [34,197,94], [20,184,166], [59,130,246], [139,92,246], [236,72,153]
-  ];
+  const VS = 'attribute vec2 a_pos;void main(){gl_Position=vec4(a_pos,0.,1.);}';
 
-  let W, H, particles;
+  const FS = [
+    'precision highp float;',
+    'uniform vec2 u_res;uniform float u_time;uniform vec2 u_mouse;uniform float u_scroll;',
+    'float hash(vec2 p){p=fract(p*vec2(443.897,441.423));p+=dot(p,p+19.19);return fract(p.x*p.y);}',
+    'float noise(vec2 p){',
+    '  vec2 i=floor(p),f=fract(p),u=f*f*f*(f*(f*6.-15.)+10.);',
+    '  return mix(mix(hash(i),hash(i+vec2(1,0)),u.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),u.x),u.y);}',
+    'float fbm(vec2 p){float v=0.,a=.5;mat2 m=mat2(.8,.6,-.6,.8);',
+    '  for(int i=0;i<4;i++){v+=a*noise(p);p=m*p*2.1+vec2(100.);a*=.5;}return v;}',
+    'vec3 hsl2rgb(float h,float s,float l){',
+    '  vec3 r=clamp(abs(mod(h*6.+vec3(0.,4.,2.),6.)-3.)-1.,0.,1.);',
+    '  return l+s*(r-.5)*(1.-abs(2.*l-1.));}',
+    'void main(){',
+    '  vec2 uv=gl_FragCoord.xy/u_res;float t=u_time*.18;',
+    '  vec2 md=uv-u_mouse;float ml=length(md);',
+    '  vec2 mw=md/(ml*ml+.06)*.035;',
+    '  vec2 q=vec2(fbm(uv*2.8+t*.30),fbm(uv*2.8+vec2(5.2,1.3)+t*.27));',
+    '  vec2 r=vec2(fbm(uv*2.+q*1.6+vec2(1.7,9.2)+t*.22+mw),',
+    '              fbm(uv*2.+q*1.6+vec2(8.3,2.8)+t*.20+mw));',
+    '  float f=fbm(uv*1.5+r*1.8);',
+    '  float hue=mod(f*1.05+.30+t*.035+u_scroll*.10,1.);',
+    '  float density=smoothstep(.28,.72,f);',
+    '  float lum=density*.42;',
+    '  vec3 col=hsl2rgb(hue,.90,lum);',
+    '  col*=1.-smoothstep(.35,.95,length(uv*2.-1.));',
+    '  gl_FragColor=vec4(col,1.);}'
+  ].join('\n');
 
-  function resize() {
-    W = canvas.width  = canvas.parentElement.offsetWidth;
-    H = canvas.height = canvas.parentElement.offsetHeight;
+  /* ── Try WebGL ── */
+  let gl = null;
+  if (!noMotion) {
+    try {
+      gl = canvas.getContext('webgl', { alpha: false, antialias: false, depth: false, stencil: false })
+        || canvas.getContext('experimental-webgl', { alpha: false });
+    } catch(_) {}
   }
 
-  function createParticles(n) {
-    return Array.from({ length: n }, () => {
+  if (!gl) {
+    /* ── 2D particle fallback ── */
+    if (noMotion) return;
+    const ctx = canvas.getContext('2d');
+    const COLORS = [
+      [239,68,68],[249,115,22],[234,179,8],[132,204,22],
+      [34,197,94],[20,184,166],[59,130,246],[139,92,246],[236,72,153]
+    ];
+    let W, H, parts;
+    const resize2d = () => {
+      W = canvas.width  = canvas.parentElement.offsetWidth;
+      H = canvas.height = canvas.parentElement.offsetHeight;
+    };
+    resize2d();
+    parts = Array.from({ length: 120 }, () => {
       const c = COLORS[Math.floor(Math.random() * COLORS.length)];
-      return {
-        x: Math.random() * W, y: Math.random() * H,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3,
-        r: Math.random() * 2.5 + 0.5,
-        a: Math.random() * 0.5 + 0.1,
-        c,
-      };
+      return { x: Math.random()*W, y: Math.random()*H,
+               vx: (Math.random()-.5)*.3, vy: (Math.random()-.5)*.3,
+               r: Math.random()*2.5+.5, a: Math.random()*.5+.1, c };
     });
-  }
-
-  resize();
-  particles = createParticles(120);
-  window.addEventListener('resize', () => { resize(); particles = createParticles(120); }, { passive: true });
-
-  function draw() {
-    ctx.clearRect(0, 0, W, H);
-    for (const p of particles) {
-      p.x = (p.x + p.vx + W) % W;
-      p.y = (p.y + p.vy + H) % H;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${p.c[0]},${p.c[1]},${p.c[2]},${p.a})`;
-      ctx.fill();
-    }
-    // Connections
-    for (let i = 0; i < particles.length; i++) {
-      for (let j = i + 1; j < particles.length; j++) {
-        const dx = particles[i].x - particles[j].x;
-        const dy = particles[i].y - particles[j].y;
-        const d  = Math.hypot(dx, dy);
-        if (d < 110) {
-          const c = particles[i].c;
-          ctx.beginPath();
-          ctx.moveTo(particles[i].x, particles[i].y);
-          ctx.lineTo(particles[j].x, particles[j].y);
-          ctx.strokeStyle = `rgba(${c[0]},${c[1]},${c[2]},${(1 - d / 110) * 0.08})`;
-          ctx.lineWidth = 0.8;
-          ctx.stroke();
+    window.addEventListener('resize', resize2d, { passive: true });
+    (function loop() {
+      ctx.clearRect(0, 0, W, H);
+      parts.forEach(p => {
+        p.x = (p.x+p.vx+W)%W; p.y = (p.y+p.vy+H)%H;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+        ctx.fillStyle = `rgba(${p.c.join()},${p.a})`; ctx.fill();
+      });
+      for (let i = 0; i < parts.length; i++) for (let j = i+1; j < parts.length; j++) {
+        const dx = parts[i].x-parts[j].x, dy = parts[i].y-parts[j].y, d = Math.hypot(dx, dy);
+        if (d < 110) { const c = parts[i].c;
+          ctx.beginPath(); ctx.moveTo(parts[i].x, parts[i].y); ctx.lineTo(parts[j].x, parts[j].y);
+          ctx.strokeStyle = `rgba(${c.join()},${(1-d/110)*.08})`; ctx.lineWidth = .8; ctx.stroke();
         }
       }
-    }
-    requestAnimationFrame(draw);
+      requestAnimationFrame(loop);
+    })();
+    return;
   }
-  draw();
-})();
+
+  /* ── Compile & link ── */
+  function mkShader(type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src); gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { console.warn(gl.getShaderInfoLog(s)); return null; }
+    return s;
+  }
+  const vs = mkShader(gl.VERTEX_SHADER, VS);
+  const fs = mkShader(gl.FRAGMENT_SHADER, FS);
+  if (!vs || !fs) return;
+
+  const prog = gl.createProgram();
+  gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { console.warn(gl.getProgramInfoLog(prog)); return; }
+
+  gl.useProgram(prog);
+  const quadBuf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]), gl.STATIC_DRAW);
+  const aPos = gl.getAttribLocation(prog, 'a_pos');
+  gl.enableVertexAttribArray(aPos);
+  gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+  const uRes   = gl.getUniformLocation(prog, 'u_res'),
+        uTime  = gl.getUniformLocation(prog, 'u_time'),
+        uMouse = gl.getUniformLocation(prog, 'u_mouse'),
+        uScroll= gl.getUniformLocation(prog, 'u_scroll');
+
+  let W, H;
+  const resize = () => {
+    W = canvas.width  = canvas.parentElement.offsetWidth;
+    H = canvas.height = canvas.parentElement.offsetHeight;
+    gl.viewport(0, 0, W, H);
+  };
+  resize();
+  window.addEventListener('resize', resize, { passive: true });
+
+  /* mouse / touch — tracked on hero parent (canvas has pointer-events:none) */
+  let mx = 0.5, my = 0.5;
+  const hero = canvas.parentElement;
+  const track = (cx, cy) => {
+    const rect = hero.getBoundingClientRect();
+    mx = (cx - rect.left) / rect.width;
+    my = 1.0 - (cy - rect.top) / rect.height;
+  };
+  hero.addEventListener('mousemove', e => track(e.clientX, e.clientY), { passive: true });
+  hero.addEventListener('touchmove', e => track(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+
+  /* pause rendering when hero is off-screen */
+  let vis = true;
+  new IntersectionObserver(([e]) => { vis = e.isIntersecting; }, { threshold: 0 }).observe(hero);
+
+  const t0 = performance.now();
+  (function frame() {
+    requestAnimationFrame(frame);
+    if (!vis) return;
+    const t = (performance.now() - t0) / 1000;
+    gl.uniform2f(uRes, W, H);
+    gl.uniform1f(uTime, t);
+    gl.uniform2f(uMouse, mx, my);
+    gl.uniform1f(uScroll, Math.min(window.scrollY / Math.max(innerHeight, 1), 1));
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+  })();
+})()
 
 /* ── Intersection Observer (reveal) ── */
 const revealObs = new IntersectionObserver((entries) => {
