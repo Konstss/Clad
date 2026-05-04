@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Haus – Vorschau</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #1a1a2e;
+      color: #eee;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 2rem;
+      color: #e94560;
+      margin-bottom: 6px;
+      letter-spacing: 1px;
+    }
+    .subtitle {
+      color: #888;
+      margin-bottom: 40px;
+      font-size: 0.9rem;
+    }
+    .grid {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      width: 100%;
+      max-width: 420px;
+    }
+    .card {
+      background: #16213e;
+      border-radius: 16px;
+      padding: 22px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+      transition: transform 0.1s;
+    }
+    .card:hover { transform: translateY(-2px); }
+    .card-left { display: flex; align-items: center; gap: 14px; }
+    .icon { font-size: 2rem; line-height: 1; transition: filter 0.3s; }
+    .icon.on { filter: drop-shadow(0 0 8px #f5a623); }
+    .card-info h2 { font-size: 1.1rem; margin-bottom: 3px; }
+    .status { font-size: 0.82rem; color: #666; }
+    .status.on { color: #f5a623; font-weight: 600; }
+    .toggle { position: relative; width: 60px; height: 32px; flex-shrink: 0; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      inset: 0;
+      background: #333;
+      border-radius: 32px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .slider:before {
+      content: '';
+      position: absolute;
+      width: 24px; height: 24px;
+      left: 4px; top: 4px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.3s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    input:checked + .slider { background: #f5a623; }
+    input:checked + .slider:before { transform: translateX(28px); }
+    .footer {
+      margin-top: 40px;
+      color: #444;
+      font-size: 0.75rem;
+    }
+    .preview-badge {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      background: #e94560;
+      color: #fff;
+      font-size: 0.7rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-family: monospace;
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+<body>
+  <span class="preview-badge">VORSCHAU</span>
+
+  <h1>&#127968; Smart Haus</h1>
+  <p class="subtitle">Beleuchtungssteuerung</p>
+
+  <div class="grid" id="grid">
+    <div class="card">
+      <div class="card-left">
+        <span class="icon" id="icon1">&#128161;</span>
+        <div class="card-info">
+          <h2>Licht 1</h2>
+          <p class="status" id="status1">Aus</p>
+        </div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="cb1" onchange="toggle(1)">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="card">
+      <div class="card-left">
+        <span class="icon" id="icon2">&#128161;</span>
+        <div class="card-info">
+          <h2>Licht 2</h2>
+          <p class="status" id="status2">Aus</p>
+        </div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="cb2" onchange="toggle(2)">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="card">
+      <div class="card-left">
+        <span class="icon" id="icon3">&#128161;</span>
+        <div class="card-info">
+          <h2>Licht 3</h2>
+          <p class="status" id="status3">Aus</p>
+        </div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="cb3" onchange="toggle(3)">
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <p class="footer">ESP32 &bull; IP: 192.168.4.1</p>
+
+  <script>
+    function toggle(relay) {
+      var cb     = document.getElementById('cb' + relay);
+      var status = document.getElementById('status' + relay);
+      var icon   = document.getElementById('icon' + relay);
+      var on     = cb.checked;
+      status.textContent = on ? 'An' : 'Aus';
+      status.className   = 'status' + (on ? ' on' : '');
+      icon.className     = 'icon'   + (on ? ' on' : '');
+    }
+  </script>
+</body>
+</html>
