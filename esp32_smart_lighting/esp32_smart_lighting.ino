@@ -15,24 +15,24 @@ const Light LIGHTS[NUM_LIGHTS] = {
   {"K\xC3\xBCche",   "\xF0\x9F\x8D\xB3",             "#fb923c", 4 },
   {"Esszimmer",      "\xF0\x9F\x8D\xBD\xEF\xB8\x8F", "#fbbf24", 5 },
   {"Flur EG",        "\xF0\x9F\x9A\xAA",             "#94a3b8", 12},
-  {"Bad EG",         "\xF0\x9F\x9A\xBF",             "#06b6d4", 13},
+  {"Bad EG",         "\xF0\x9F\x9B\x81",             "#06b6d4", 13},
   {"Garage",         "\xF0\x9F\x9A\x97",             "#22c55e", 14},
   {"Garten",         "\xF0\x9F\x8C\xBF",             "#10b981", 15},
   // 1.OG (Index 7–13)
   {"Schlafzimmer",   "\xF0\x9F\x9B\x8F\xEF\xB8\x8F", "#6366f1", 16},
   {"Kinderzimmer 1", "\xF0\x9F\xA7\xB8",             "#ec4899", 17},
-  {"Kinderzimmer 2", "\xF0\x9F\xA7\xB8",             "#a855f7", 18},
+  {"Kinderzimmer 2", "\xF0\x9F\x8E\xAE",             "#a855f7", 18},
   {"B\xC3\xBCro",    "\xF0\x9F\x92\xBB",             "#8b5cf6", 19},
   {"Bad 1.OG",       "\xF0\x9F\x9A\xBF",             "#06b6d4", 21},
   {"Ankleide",       "\xF0\x9F\x91\x97",             "#f43f5e", 22},
-  {"Flur 1.OG",      "\xF0\x9F\x9A\xAA",             "#94a3b8", 23},
+  {"Flur 1.OG",      "\xF0\x9F\xAA\x9C",             "#94a3b8", 23},
   // 2.OG (Index 14–19)
-  {"G\xC3\xA4stezimmer", "\xF0\x9F\x9B\x8F\xEF\xB8\x8F", "#3b82f6", 25},
+  {"G\xC3\xA4stezimmer", "\xF0\x9F\x8C\xB8",             "#3b82f6", 25},
   {"Fitness",            "\xF0\x9F\x8F\x8B\xEF\xB8\x8F", "#ef4444", 26},
-  {"Bad 2.OG",           "\xF0\x9F\x9A\xBF",             "#06b6d4", 27},
+  {"Bad 2.OG",           "\xF0\x9F\xA7\xB4",             "#06b6d4", 27},
   {"Dachboden",          "\xF0\x9F\x93\xA6",             "#eab308", 32},
   {"Terrasse",           "\xE2\x98\x80\xEF\xB8\x8F",     "#facc15", 33},
-  {"Flur 2.OG",          "\xF0\x9F\x9A\xAA",             "#94a3b8", 0 },
+  {"Flur 2.OG",          "\xF0\x9F\x94\x91",             "#94a3b8", 0 },
 };
 
 const bool SCENES[NUM_SCENES][NUM_LIGHTS] = {
@@ -71,12 +71,9 @@ main{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:18px 14px
 .hero-greet{font-size:.88rem;color:#94a3b8;margin-bottom:6px;font-weight:500;display:flex;align-items:center;gap:6px}
 .hero-num{font-size:3rem;font-weight:800;line-height:1;letter-spacing:-2px;background:linear-gradient(135deg,#fff,#cbd5e1);-webkit-background-clip:text;background-clip:text;color:transparent}
 .hero-num .of{font-size:1.3rem;color:#64748b;font-weight:500;margin-left:4px;-webkit-text-fill-color:#64748b}
-.hero-lbl{font-size:.85rem;color:#94a3b8;margin-top:4px;margin-bottom:18px}
-.hero-btns{display:flex;gap:8px}
-.hero-btn{flex:1;padding:11px 16px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#fff;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit}
-.hero-btn:hover{background:rgba(255,255,255,.12);transform:translateY(-1px)}
-.hero-btn.primary{background:linear-gradient(135deg,#f59e0b,#ec4899);border-color:transparent;box-shadow:0 4px 16px rgba(245,158,11,.3)}
-.section-title{font-size:.78rem;text-transform:uppercase;letter-spacing:1px;color:#64748b;font-weight:700;padding:0 4px}
+.hero-lbl{font-size:.85rem;color:#94a3b8;margin-top:4px}
+.hero-progress{height:4px;background:rgba(255,255,255,.08);border-radius:4px;margin-top:14px;overflow:hidden}
+.hero-progress-bar{height:100%;background:linear-gradient(90deg,#f59e0b,#ec4899);border-radius:4px;width:0;transition:width .4s cubic-bezier(.4,0,.2,1)}
 .scenes{display:flex;gap:8px;overflow-x:auto;padding:4px 4px 8px;margin:0 -4px;scrollbar-width:none}
 .scenes::-webkit-scrollbar{display:none}
 .chip{display:flex;align-items:center;gap:6px;padding:9px 16px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#cbd5e1;cursor:pointer;font-size:.83rem;white-space:nowrap;flex-shrink:0;font-family:inherit;font-weight:500;transition:all .2s}
@@ -119,12 +116,8 @@ footer{text-align:center;color:#1e293b;font-size:.7rem;margin-top:14px;position:
     <div class="hero-greet" id="greet">&#128075; Hallo</div>
     <div class="hero-num"><span id="heroNum">0</span><span class="of">/20</span></div>
     <div class="hero-lbl" id="heroLbl">Lichter eingeschaltet</div>
-    <div class="hero-btns">
-      <button class="hero-btn primary" onclick="scene(0)">Alle einschalten</button>
-      <button class="hero-btn" onclick="scene(4)">Alle aus</button>
-    </div>
+    <div class="hero-progress"><div class="hero-progress-bar" id="heroBar"></div></div>
   </section>
-  <div class="section-title">Szenen</div>
   <div class="scenes">
     <button class="chip" onclick="scene(0)">&#9728; Alle AN</button>
     <button class="chip" onclick="scene(1)">&#127750; Abend</button>
@@ -133,7 +126,7 @@ footer{text-align:center;color:#1e293b;font-size:.7rem;margin-top:14px;position:
     <button class="chip" onclick="scene(4)">&#9899; Alle AUS</button>
   </div>
   <div class="tabs">
-    <button class="tab active" onclick="setFloor(0)">Erdgeschoss<span class="tn" id="tn0">0/7 an</span></button>
+    <button class="tab active" onclick="setFloor(0)">EG<span class="tn" id="tn0">0/7 an</span></button>
     <button class="tab" onclick="setFloor(1)">1. OG<span class="tn" id="tn1">0/7 an</span></button>
     <button class="tab" onclick="setFloor(2)">2. OG<span class="tn" id="tn2">0/6 an</span></button>
   </div>
@@ -190,6 +183,7 @@ function upd(){
   var total = S.filter(Boolean).length;
   document.getElementById('hon').textContent = total;
   document.getElementById('heroNum').textContent = total;
+  document.getElementById('heroBar').style.width = (total/20*100)+'%';
   document.getElementById('heroLbl').textContent = total===0?'Alle Lichter sind aus':total===20?'Alle Lichter sind an':'Lichter eingeschaltet';
   for(var f=0; f<3; f++){
     var on = 0;
