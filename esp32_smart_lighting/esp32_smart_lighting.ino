@@ -90,9 +90,7 @@ main{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:18px 14px
 .tile.on::before{opacity:.4}
 .tile.on{border-color:var(--tc);background:rgba(255,255,255,.06);box-shadow:0 0 30px color-mix(in srgb,var(--tc) 25%,transparent),inset 0 1px 0 rgba(255,255,255,.1)}
 .tile:active{transform:scale(.95)}
-.tile-top{display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:1}
-.tile-icon{font-size:1.7rem;line-height:1;transition:filter .35s,transform .35s}
-.tile.on .tile-icon{filter:drop-shadow(0 0 12px var(--tc));transform:scale(1.1)}
+.tile-top{display:flex;justify-content:flex-end;align-items:flex-start;position:relative;z-index:1}
 .tile-toggle{width:36px;height:22px;border-radius:22px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);position:relative;flex-shrink:0;transition:all .3s}
 .tile-toggle::after{content:'';position:absolute;width:16px;height:16px;left:2px;top:2px;border-radius:50%;background:#475569;transition:all .3s}
 .tile.on .tile-toggle{background:var(--tc);border-color:var(--tc);box-shadow:0 0 12px var(--tc)}
@@ -160,7 +158,7 @@ function renderTiles(){
     el.style = '--tc:'+L.c;
     el.onclick = (function(id){return function(){toggle(id)}})(i);
     el.innerHTML =
-      '<div class="tile-top"><span class="tile-icon">'+L.i+'</span><span class="tile-toggle"></span></div>'+
+      '<div class="tile-top"><span class="tile-toggle"></span></div>'+
       '<div class="tile-bottom"><div class="tile-name">'+L.n+'</div><div class="tile-status">'+(on?'An':'Aus')+'</div></div>';
     tiles.appendChild(el);
   }
