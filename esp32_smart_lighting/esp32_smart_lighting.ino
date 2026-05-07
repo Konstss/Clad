@@ -4,154 +4,219 @@
 const char* SSID     = "SmartHaus";
 const char* PASSWORD = "12345678";
 
-// ── Licht-Definitionen ────────────────────────────────────────
 #define NUM_LIGHTS 20
 #define NUM_SCENES 5
 
-struct Light { const char* name; const char* icon; int pin; };
+struct Light { const char* name; const char* icon; const char* color; int pin; };
 
 const Light LIGHTS[NUM_LIGHTS] = {
-  {"Wohnzimmer",   "&#128715;", 2 }, {"K&uuml;che",   "&#127859;", 4 },
-  {"Esszimmer",    "&#127869;", 5 }, {"Flur EG",      "&#128682;", 12},
-  {"Bad EG",       "&#128703;", 13}, {"Garage",       "&#128663;", 14},
-  {"Garten",       "&#127807;", 15},
-  {"Schlafzimmer", "&#128717;", 16}, {"Kinderzimmer 1","&#129528;", 17},
-  {"Kinderzimmer 2","&#129528;",18}, {"B&uuml;ro",    "&#128187;", 19},
-  {"Bad 1.OG",     "&#128703;", 21}, {"Ankleide",     "&#128131;", 22},
-  {"Flur 1.OG",    "&#128682;", 23},
-  {"G&auml;stezimmer","&#128717;",25},{"Fitness",      "&#127947;", 26},
-  {"Bad 2.OG",     "&#128703;", 27}, {"Dachboden",    "&#128230;", 32},
-  {"Terrasse",     "&#9728;",   33}, {"Flur 2.OG",    "&#128682;", 0 },
+  // EG (Index 0–6)
+  {"Wohnzimmer",     "\xF0\x9F\x9B\x8B\xEF\xB8\x8F", "#f59e0b", 2 },
+  {"K\xC3\xBCche",   "\xF0\x9F\x8D\xB3",             "#fb923c", 4 },
+  {"Esszimmer",      "\xF0\x9F\x8D\xBD\xEF\xB8\x8F", "#fbbf24", 5 },
+  {"Flur EG",        "\xF0\x9F\x9A\xAA",             "#94a3b8", 12},
+  {"Bad EG",         "\xF0\x9F\x9A\xBF",             "#06b6d4", 13},
+  {"Garage",         "\xF0\x9F\x9A\x97",             "#22c55e", 14},
+  {"Garten",         "\xF0\x9F\x8C\xBF",             "#10b981", 15},
+  // 1.OG (Index 7–13)
+  {"Schlafzimmer",   "\xF0\x9F\x9B\x8F\xEF\xB8\x8F", "#6366f1", 16},
+  {"Kinderzimmer 1", "\xF0\x9F\xA7\xB8",             "#ec4899", 17},
+  {"Kinderzimmer 2", "\xF0\x9F\xA7\xB8",             "#a855f7", 18},
+  {"B\xC3\xBCro",    "\xF0\x9F\x92\xBB",             "#8b5cf6", 19},
+  {"Bad 1.OG",       "\xF0\x9F\x9A\xBF",             "#06b6d4", 21},
+  {"Ankleide",       "\xF0\x9F\x91\x97",             "#f43f5e", 22},
+  {"Flur 1.OG",      "\xF0\x9F\x9A\xAA",             "#94a3b8", 23},
+  // 2.OG (Index 14–19)
+  {"G\xC3\xA4stezimmer", "\xF0\x9F\x9B\x8F\xEF\xB8\x8F", "#3b82f6", 25},
+  {"Fitness",            "\xF0\x9F\x8F\x8B\xEF\xB8\x8F", "#ef4444", 26},
+  {"Bad 2.OG",           "\xF0\x9F\x9A\xBF",             "#06b6d4", 27},
+  {"Dachboden",          "\xF0\x9F\x93\xA6",             "#eab308", 32},
+  {"Terrasse",           "\xE2\x98\x80\xEF\xB8\x8F",     "#facc15", 33},
+  {"Flur 2.OG",          "\xF0\x9F\x9A\xAA",             "#94a3b8", 0 },
 };
 
-struct Floor  { int start; int count; const char* name; const char* badge; const char* color; };
-const Floor FLOORS[3] = {
-  {0,  7, "Erdgeschoss",     "EG",   "#f59e0b"},
-  {7,  7, "1. Obergeschoss", "1.OG", "#3b82f6"},
-  {14, 6, "2. Obergeschoss", "2.OG", "#8b5cf6"},
-};
-
-struct Scene  { const char* name; const char* icon; bool states[NUM_LIGHTS]; };
-const Scene SCENES[NUM_SCENES] = {
-  {"Alle AN",  "&#9728;",   {1,1,1,1,1,1,1, 1,1,1,1,1,1,1, 1,1,1,1,1,1}},
-  {"Abend",    "&#127748;", {1,1,1,1,0,0,0, 0,0,0,0,0,0,0, 0,0,0,0,0,0}},
-  {"Nacht",    "&#127769;", {0,0,0,1,0,0,0, 0,0,0,0,0,0,1, 0,0,0,0,0,1}},
-  {"Film",     "&#127916;", {1,0,0,0,0,0,0, 0,0,0,0,0,0,0, 0,0,0,0,0,0}},
-  {"Alle AUS", "&#9899;",   {0,0,0,0,0,0,0, 0,0,0,0,0,0,0, 0,0,0,0,0,0}},
+const bool SCENES[NUM_SCENES][NUM_LIGHTS] = {
+  {1,1,1,1,1,1,1, 1,1,1,1,1,1,1, 1,1,1,1,1,1},  // Alle AN
+  {1,1,1,1,0,0,0, 0,0,0,0,0,0,0, 0,0,0,0,0,0},  // Abend
+  {0,0,0,1,0,0,0, 0,0,0,0,0,0,1, 0,0,0,0,0,1},  // Nacht (Flure)
+  {1,0,0,0,0,0,0, 0,0,0,0,0,0,0, 0,0,0,0,0,0},  // Film (nur Wohnzimmer)
+  {0,0,0,0,0,0,0, 0,0,0,0,0,0,0, 0,0,0,0,0,0},  // Alle AUS
 };
 
 bool lightState[NUM_LIGHTS] = {};
 WebServer server(80);
 
-// ── CSS + JS ──────────────────────────────────────────────────
-const char PAGE_CSS[] PROGMEM = R"rawliteral(<style>
+// ── Statisches HTML/CSS/JS-Template ──────────────────────────
+const char PAGE[] PROGMEM = R"HTML(<!DOCTYPE html>
+<html lang="de"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Smart Haus</title>
+<style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',Arial,sans-serif;background:#060614;color:#e2e8f0;min-height:100vh;padding-bottom:60px}
-body::before,body::after{content:'';position:fixed;border-radius:50%;filter:blur(130px);z-index:0;pointer-events:none}
-body::before{width:600px;height:600px;background:rgba(59,130,246,.06);top:-200px;left:-200px}
-body::after{width:500px;height:500px;background:rgba(139,92,246,.06);bottom:-100px;right:-100px}
-header{position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);background:rgba(6,6,20,.92);border-bottom:1px solid rgba(255,255,255,.07);padding:13px 18px;display:flex;align-items:center;gap:10px}
-.logo{font-size:1.25rem;font-weight:700;color:#fff;flex:1}.logo span{color:#f59e0b}
-.hbadge{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:4px 11px;font-size:.76rem;color:#94a3b8;white-space:nowrap}
-.hbadge b{color:#fff}
-.sdot{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px #22c55e;flex-shrink:0}
-.sdot.off{background:#ef4444;box-shadow:0 0 8px #ef4444}
-.sbar{display:flex;gap:7px;padding:12px 14px;overflow-x:auto;position:relative;z-index:1;border-bottom:1px solid rgba(255,255,255,.05)}
-.sbar::-webkit-scrollbar{display:none}
-.sbtn{display:flex;align-items:center;gap:5px;padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#64748b;cursor:pointer;font-size:.78rem;white-space:nowrap;transition:all .2s;flex-shrink:0;font-family:inherit}
-.sbtn:hover{background:rgba(255,255,255,.09);color:#cbd5e1;border-color:rgba(255,255,255,.2)}
-.sbtn.active{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.4);color:#fbbf24}
-main{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:18px 12px;display:flex;flex-direction:column;gap:16px}
-.floor{border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.02)}
-.fhdr{display:flex;align-items:center;gap:9px;padding:13px 16px;cursor:pointer;user-select:none;transition:background .2s}
-.fhdr:hover{background:rgba(255,255,255,.03)}
-.fpill{font-size:.67rem;font-weight:700;padding:2px 8px;border-radius:10px;border:1px solid currentColor;flex-shrink:0;letter-spacing:.5px}
-.ftitle{font-size:.92rem;font-weight:600;color:#cbd5e1;flex:1}
-.fcnt{font-size:.73rem;color:#475569;flex-shrink:0}
-.fbtns{display:flex;gap:5px;flex-shrink:0}
-.fbtns button{font-size:.68rem;padding:4px 9px;border-radius:7px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#64748b;cursor:pointer;transition:.2s;font-family:inherit}
-.fbtns button:hover{background:rgba(255,255,255,.09);color:#e2e8f0}
-.chev{color:#334155;font-size:.6rem;transition:transform .35s;flex-shrink:0}
-.floor.closed .chev{transform:rotate(-90deg)}
-.fprog{height:2px;background:rgba(255,255,255,.04)}
-.fprogb{height:100%;border-radius:2px;transition:width .5s ease}
-.fbody{overflow:hidden;transition:max-height .4s cubic-bezier(.4,0,.2,1)}
-.floor.closed .fbody{max-height:0!important}
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:9px;padding:12px}
-.card{border-radius:13px;padding:14px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;align-items:center;gap:7px;transition:border-color .3s,background .3s,box-shadow .3s;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.card:active{transform:scale(.95)}
-.card:hover{background:rgba(255,255,255,.05)}
-@keyframes glow{0%,100%{box-shadow:0 0 14px color-mix(in srgb,var(--fc) 18%,transparent)}50%{box-shadow:0 0 28px color-mix(in srgb,var(--fc) 32%,transparent)}}
-.card.on{border-color:var(--fc);background:color-mix(in srgb,var(--fc) 6%,transparent);animation:glow 3s ease-in-out infinite}
-.cicon{font-size:1.9rem;transition:filter .3s;line-height:1}
-.card.on .cicon{filter:drop-shadow(0 0 8px var(--fc))}
-.cname{font-size:.73rem;color:#94a3b8;text-align:center;font-weight:500;line-height:1.3}
-.cstat{font-size:.67rem;padding:2px 9px;border-radius:9px;background:rgba(255,255,255,.04);color:#334155;transition:all .3s}
-.card.on .cstat{background:color-mix(in srgb,var(--fc) 12%,transparent);color:var(--fc);font-weight:600}
-.tgl{position:relative;width:42px;height:23px;flex-shrink:0;margin-top:1px}
-.tgl input{opacity:0;width:0;height:0}
-.tslider{position:absolute;inset:0;background:#1a2332;border-radius:23px;cursor:pointer;transition:.3s;border:1px solid rgba(255,255,255,.08)}
-.tslider:before{content:'';position:absolute;width:15px;height:15px;left:3px;top:3px;background:#374151;border-radius:50%;transition:.3s}
-input:checked+.tslider{background:var(--fc);border-color:var(--fc)}
-input:checked+.tslider:before{transform:translateX(19px);background:#fff}
-footer{text-align:center;color:#1e293b;font-size:.68rem;margin-top:16px;position:relative;z-index:1}
-@media(max-width:500px){.fhdr{flex-wrap:wrap}.fbtns{order:5;width:100%}.fbtns button{flex:1}.cards{grid-template-columns:repeat(2,1fr)}.chev{display:none}}
-</style>)rawliteral";
+body{font-family:-apple-system,'SF Pro Display','Segoe UI',Arial,sans-serif;background:#08080f;color:#e5e7eb;min-height:100vh;padding-bottom:50px;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 600px 400px at 20% 10%,rgba(245,158,11,.08),transparent),radial-gradient(ellipse 500px 400px at 80% 30%,rgba(99,102,241,.08),transparent),radial-gradient(ellipse 700px 500px at 50% 90%,rgba(168,85,247,.06),transparent);z-index:0;pointer-events:none}
+header{position:sticky;top:0;z-index:100;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);background:rgba(8,8,15,.7);border-bottom:1px solid rgba(255,255,255,.05);padding:14px 18px;display:flex;align-items:center;gap:10px}
+.logo{font-size:1.2rem;font-weight:700;color:#fff;flex:1;letter-spacing:-.3px}
+.logo .icon{font-size:1.3rem;margin-right:4px}
+.logo .accent{background:linear-gradient(135deg,#f59e0b,#ec4899);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hstat{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:5px 12px;font-size:.78rem;color:#cbd5e1;white-space:nowrap}
+.hstat b{color:#fff;font-weight:600}
+.dot{width:7px;height:7px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px #22c55e;flex-shrink:0;animation:pulse 2s ease-in-out infinite}
+.dot.off{background:#ef4444;box-shadow:0 0 8px #ef4444;animation:none}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+main{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:18px 14px;display:flex;flex-direction:column;gap:18px}
+.hero{position:relative;border-radius:24px;padding:24px 22px;background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(236,72,153,.08));border:1px solid rgba(255,255,255,.08);overflow:hidden}
+.hero::before{content:'';position:absolute;top:-50px;right:-50px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(245,158,11,.15),transparent 70%);pointer-events:none}
+.hero-greet{font-size:.88rem;color:#94a3b8;margin-bottom:6px;font-weight:500;display:flex;align-items:center;gap:6px}
+.hero-num{font-size:3rem;font-weight:800;line-height:1;letter-spacing:-2px;background:linear-gradient(135deg,#fff,#cbd5e1);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-num .of{font-size:1.3rem;color:#64748b;font-weight:500;margin-left:4px;-webkit-text-fill-color:#64748b}
+.hero-lbl{font-size:.85rem;color:#94a3b8;margin-top:4px;margin-bottom:18px}
+.hero-btns{display:flex;gap:8px}
+.hero-btn{flex:1;padding:11px 16px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#fff;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit}
+.hero-btn:hover{background:rgba(255,255,255,.12);transform:translateY(-1px)}
+.hero-btn.primary{background:linear-gradient(135deg,#f59e0b,#ec4899);border-color:transparent;box-shadow:0 4px 16px rgba(245,158,11,.3)}
+.section-title{font-size:.78rem;text-transform:uppercase;letter-spacing:1px;color:#64748b;font-weight:700;padding:0 4px}
+.scenes{display:flex;gap:8px;overflow-x:auto;padding:4px 4px 8px;margin:0 -4px;scrollbar-width:none}
+.scenes::-webkit-scrollbar{display:none}
+.chip{display:flex;align-items:center;gap:6px;padding:9px 16px;border-radius:14px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#cbd5e1;cursor:pointer;font-size:.83rem;white-space:nowrap;flex-shrink:0;font-family:inherit;font-weight:500;transition:all .2s}
+.chip:hover{background:rgba(255,255,255,.08);transform:translateY(-1px)}
+.chip.active{background:#fff;color:#0c0c1d;border-color:#fff;font-weight:600}
+.tabs{display:flex;gap:4px;background:rgba(255,255,255,.04);padding:5px;border-radius:14px;border:1px solid rgba(255,255,255,.06)}
+.tab{flex:1;padding:9px 8px;border-radius:10px;border:none;background:transparent;color:#94a3b8;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .25s;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:1px}
+.tab .tn{font-size:.65rem;color:#64748b;font-weight:500}
+.tab.active{background:#fff;color:#0c0c1d;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.tab.active .tn{color:#64748b}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:11px}
+.tile{position:relative;aspect-ratio:1;border-radius:22px;padding:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;transition:all .35s cubic-bezier(.34,1.56,.64,1);overflow:hidden;-webkit-tap-highlight-color:transparent}
+.tile::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--tc),transparent 70%);opacity:0;transition:opacity .4s}
+.tile.on::before{opacity:.4}
+.tile.on{border-color:var(--tc);background:rgba(255,255,255,.06);box-shadow:0 0 30px color-mix(in srgb,var(--tc) 25%,transparent),inset 0 1px 0 rgba(255,255,255,.1)}
+.tile:active{transform:scale(.95)}
+.tile-top{display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:1}
+.tile-icon{font-size:1.7rem;line-height:1;transition:filter .35s,transform .35s}
+.tile.on .tile-icon{filter:drop-shadow(0 0 12px var(--tc));transform:scale(1.1)}
+.tile-toggle{width:36px;height:22px;border-radius:22px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);position:relative;flex-shrink:0;transition:all .3s}
+.tile-toggle::after{content:'';position:absolute;width:16px;height:16px;left:2px;top:2px;border-radius:50%;background:#475569;transition:all .3s}
+.tile.on .tile-toggle{background:var(--tc);border-color:var(--tc);box-shadow:0 0 12px var(--tc)}
+.tile.on .tile-toggle::after{transform:translateX(14px);background:#fff}
+.tile-bottom{position:relative;z-index:1}
+.tile-name{font-size:.92rem;font-weight:600;color:#fff;line-height:1.2;margin-bottom:2px}
+.tile-status{font-size:.7rem;color:#64748b;font-weight:500}
+.tile.on .tile-status{color:var(--tc);font-weight:600}
+.fade-in{animation:fadeIn .35s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+footer{text-align:center;color:#1e293b;font-size:.7rem;margin-top:14px;position:relative;z-index:1}
+@media(max-width:430px){.tiles{grid-template-columns:repeat(2,1fr);gap:10px}.hero-num{font-size:2.6rem}.hero{padding:20px 18px}}
+</style>
+</head><body>
+<header>
+  <div class="logo"><span class="icon">&#127968;</span> Smart <span class="accent">Haus</span></div>
+  <div class="hstat"><span class="dot" id="dot"></span><b id="hon">0</b>/20</div>
+</header>
+<main>
+  <section class="hero">
+    <div class="hero-greet" id="greet">&#128075; Hallo</div>
+    <div class="hero-num"><span id="heroNum">0</span><span class="of">/20</span></div>
+    <div class="hero-lbl" id="heroLbl">Lichter eingeschaltet</div>
+    <div class="hero-btns">
+      <button class="hero-btn primary" onclick="scene(0)">Alle einschalten</button>
+      <button class="hero-btn" onclick="scene(4)">Alle aus</button>
+    </div>
+  </section>
+  <div class="section-title">Szenen</div>
+  <div class="scenes">
+    <button class="chip" onclick="scene(0)">&#9728; Alle AN</button>
+    <button class="chip" onclick="scene(1)">&#127750; Abend</button>
+    <button class="chip" onclick="scene(2)">&#127769; Nacht</button>
+    <button class="chip" onclick="scene(3)">&#127916; Film</button>
+    <button class="chip" onclick="scene(4)">&#9899; Alle AUS</button>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="setFloor(0)">Erdgeschoss<span class="tn" id="tn0">0/7 an</span></button>
+    <button class="tab" onclick="setFloor(1)">1. OG<span class="tn" id="tn1">0/7 an</span></button>
+    <button class="tab" onclick="setFloor(2)">2. OG<span class="tn" id="tn2">0/6 an</span></button>
+  </div>
+  <div class="tiles" id="tiles"></div>
+</main>
+<footer>ESP32 &bull; %IP%</footer>
+<script>
+var LIGHTS = %LIGHTS%;
+var S = %STATES%;
+var FS = [0,7,14], FC = [7,7,6];
+var currentFloor = 0;
 
-const char PAGE_JS[] PROGMEM = R"rawliteral(<script>
-var S=%STATES%;
-var FS=[0,7,14],FC=[7,7,6];
-var activeScene=-1;
-function uc(id,on){
-  var c=document.getElementById('c'+id),st=document.getElementById('s'+id),cb=document.getElementById('b'+id);
-  S[id]=on;cb.checked=on;
-  c.classList.toggle('on',on);
-  st.textContent=on?'An':'Aus';
+function setGreet(){
+  var h = new Date().getHours(), g = 'Hallo', e = '\u{1F44B}';
+  if(h<6){g='Gute Nacht';e='\u{1F319}'}
+  else if(h<11){g='Guten Morgen';e='☀️'}
+  else if(h<18){g='Guten Tag';e='\u{1F324}️'}
+  else if(h<22){g='Guten Abend';e='\u{1F306}'}
+  else{g='Gute Nacht';e='\u{1F319}'}
+  document.getElementById('greet').innerHTML = e+' '+g;
+}
+function renderTiles(){
+  var tiles = document.getElementById('tiles');
+  tiles.innerHTML = '';
+  var s = FS[currentFloor], c = FC[currentFloor];
+  for(var i=s; i<s+c; i++){
+    var L = LIGHTS[i], on = S[i];
+    var el = document.createElement('div');
+    el.className = 'tile fade-in'+(on?' on':'');
+    el.id = 't'+i;
+    el.style = '--tc:'+L.c;
+    el.onclick = (function(id){return function(){toggle(id)}})(i);
+    el.innerHTML =
+      '<div class="tile-top"><span class="tile-icon">'+L.i+'</span><span class="tile-toggle"></span></div>'+
+      '<div class="tile-bottom"><div class="tile-name">'+L.n+'</div><div class="tile-status">'+(on?'An':'Aus')+'</div></div>';
+    tiles.appendChild(el);
+  }
+}
+function setFloor(f){
+  currentFloor = f;
+  document.querySelectorAll('.tab').forEach(function(t,i){t.classList.toggle('active', i===f)});
+  renderTiles();
+}
+function uc(id, on){
+  S[id] = on;
+  var t = document.getElementById('t'+id);
+  if(t){
+    t.classList.toggle('on', on);
+    t.querySelector('.tile-status').textContent = on?'An':'Aus';
+  }
   upd();
 }
 function upd(){
-  var t=S.filter(Boolean).length;
-  document.getElementById('hon').textContent=t;
-  for(var f=0;f<3;f++){
-    var on=0;
-    for(var i=FS[f];i<FS[f]+FC[f];i++) if(S[i])on++;
-    document.getElementById('fc'+f).textContent=on+'/'+FC[f]+' an';
-    var pct=Math.round(on/FC[f]*100);
-    document.getElementById('fp'+f).style.width=pct+'%';
+  var total = S.filter(Boolean).length;
+  document.getElementById('hon').textContent = total;
+  document.getElementById('heroNum').textContent = total;
+  document.getElementById('heroLbl').textContent = total===0?'Alle Lichter sind aus':total===20?'Alle Lichter sind an':'Lichter eingeschaltet';
+  for(var f=0; f<3; f++){
+    var on = 0;
+    for(var i=FS[f]; i<FS[f]+FC[f]; i++) if(S[i]) on++;
+    document.getElementById('tn'+f).textContent = on+'/'+FC[f]+' an';
   }
 }
 function toggle(id){
-  var on=document.getElementById('b'+id).checked;
-  uc(id,on);
-  activeScene=-1;updScene(-1);
-  fetch('/set?relay='+id+'&state='+(on?1:0)).catch(function(){uc(id,!on)});
-}
-function floorAll(f,state){
-  for(var i=FS[f];i<FS[f]+FC[f];i++){uc(i,state);fetch('/set?relay='+i+'&state='+(state?1:0));}
-  activeScene=-1;updScene(-1);
+  var newState = !S[id];
+  uc(id, newState);
+  document.querySelectorAll('.chip').forEach(function(b){b.classList.remove('active')});
+  fetch('/set?relay='+id+'&state='+(newState?1:0)).catch(function(){uc(id, !newState)});
 }
 function scene(id){
-  fetch('/scene?id='+id).then(function(r){return r.json();}).then(function(d){
-    if(d.states){d.states.forEach(function(on,i){uc(i,on);});}
-    activeScene=id;updScene(id);
-  }).catch(function(){});
-}
-function updScene(id){
-  document.querySelectorAll('.sbtn').forEach(function(b,i){b.classList.toggle('active',i===id);});
-}
-function toggleFloor(f){
-  var fl=document.getElementById('floor'+f);
-  var body=document.getElementById('fb'+f);
-  var closing=!fl.classList.contains('closed');
-  if(!closing) body.style.maxHeight=body.scrollHeight+'px';
-  fl.classList.toggle('closed',closing);
-  if(!closing) setTimeout(function(){body.style.maxHeight=body.scrollHeight+'px';},10);
+  fetch('/scene?id='+id).then(function(r){return r.json()}).then(function(d){
+    if(d.states) for(var i=0;i<20;i++) uc(i, !!d.states[i]);
+    document.querySelectorAll('.chip').forEach(function(b,i){b.classList.toggle('active', i===id)});
+  });
 }
 function ping(){
-  fetch('/status').then(function(){document.getElementById('sdot').className='sdot';}).catch(function(){document.getElementById('sdot').className='sdot off';});
+  fetch('/status').then(function(){document.getElementById('dot').className='dot'}).catch(function(){document.getElementById('dot').className='dot off'});
 }
-setInterval(ping,6000);
-</script>)rawliteral";
+setGreet(); setFloor(0); upd();
+setInterval(setGreet, 60000);
+setInterval(ping, 6000);
+</script>
+</body></html>)HTML";
 
 // ── Relay-Steuerung ───────────────────────────────────────────
 
@@ -162,92 +227,34 @@ void setRelay(int idx, bool on) {
 
 // ── Seitenaufbau ──────────────────────────────────────────────
 
-String buildPage() {
-  // States-JSON
-  String states = "[";
+String buildLightsJson() {
+  String j = "[";
   for (int i = 0; i < NUM_LIGHTS; i++) {
-    states += lightState[i] ? "true" : "false";
-    if (i < NUM_LIGHTS - 1) states += ",";
+    j += "{\"n\":\"" + String(LIGHTS[i].name) +
+         "\",\"i\":\"" + String(LIGHTS[i].icon) +
+         "\",\"c\":\"" + String(LIGHTS[i].color) + "\"}";
+    if (i < NUM_LIGHTS - 1) j += ",";
   }
-  states += "]";
-
-  int totalOn = 0;
-  for (int i = 0; i < NUM_LIGHTS; i++) if (lightState[i]) totalOn++;
-
-  String p = "<!DOCTYPE html><html lang='de'><head><meta charset='UTF-8'>";
-  p += "<meta name='viewport' content='width=device-width,initial-scale=1'>";
-  p += "<title>Smart Haus</title>";
-  p += String(FPSTR(PAGE_CSS));
-  p += "</head><body>";
-
-  // Header
-  p += "<header>";
-  p += "<div class='logo'>&#127968; Smart <span>Haus</span></div>";
-  p += "<div class='hbadge'><b id='hon'>" + String(totalOn) + "</b> / " + String(NUM_LIGHTS) + " an</div>";
-  p += "<div class='sdot' id='sdot'></div>";
-  p += "</header>";
-
-  // Szenen-Leiste
-  p += "<div class='sbar'>";
-  for (int i = 0; i < NUM_SCENES; i++) {
-    p += "<button class='sbtn' onclick='scene(" + String(i) + ")'>";
-    p += String(SCENES[i].icon) + " " + String(SCENES[i].name);
-    p += "</button>";
-  }
-  p += "</div>";
-
-  // Etagen
-  p += "<main>";
-  const char* floorColors[3] = {"#f59e0b","#3b82f6","#8b5cf6"};
-
-  for (int f = 0; f < 3; f++) {
-    const Floor& fl = FLOORS[f];
-    int on = 0;
-    for (int i = fl.start; i < fl.start + fl.count; i++) if (lightState[i]) on++;
-    int pct = fl.count > 0 ? (on * 100 / fl.count) : 0;
-
-    p += "<section class='floor' id='floor" + String(f) + "'>";
-
-    // Header
-    p += "<div class='fhdr' onclick='toggleFloor(" + String(f) + ")'>";
-    p += "<span class='fpill' style='color:" + String(fl.color) + "'>" + fl.badge + "</span>";
-    p += "<span class='ftitle'>" + fl.name + "</span>";
-    p += "<span class='fcnt' id='fc" + String(f) + "'>" + String(on) + "/" + String(fl.count) + " an</span>";
-    p += "<div class='fbtns'><button onclick='event.stopPropagation();floorAll(" + String(f) + ",true)'>Alle AN</button>";
-    p += "<button onclick='event.stopPropagation();floorAll(" + String(f) + ",false)'>Alle AUS</button></div>";
-    p += "<span class='chev'>&#9660;</span></div>";
-
-    // Progress bar
-    p += "<div class='fprog'><div class='fprogb' id='fp" + String(f) + "' style='width:" + String(pct) + "%;background:" + fl.color + "'></div></div>";
-
-    // Karten
-    p += "<div class='fbody' id='fb" + String(f) + "' style='max-height:1000px'><div class='cards'>";
-    for (int i = fl.start; i < fl.start + fl.count; i++) {
-      bool card_on = lightState[i];
-      p += "<div class='card" + String(card_on ? " on" : "") + "' id='c" + String(i) + "' style='--fc:" + fl.color + "' onclick='document.getElementById(\"b" + String(i) + "\").click()'>";
-      p += "<div class='cicon'>" + String(LIGHTS[i].icon) + "</div>";
-      p += "<div class='cname'>" + String(LIGHTS[i].name) + "</div>";
-      p += "<div class='cstat' id='s" + String(i) + "'>" + (card_on ? "An" : "Aus") + "</div>";
-      p += "<label class='tgl' onclick='event.stopPropagation()'>";
-      p += "<input type='checkbox' id='b" + String(i) + "'" + String(card_on ? " checked" : "") + " onchange='toggle(" + String(i) + ")'>";
-      p += "<span class='tslider'></span></label></div>";
-    }
-    p += "</div></div></section>";
-  }
-
-  p += "</main><footer>ESP32 &bull; " + WiFi.softAPIP().toString() + "</footer>";
-
-  String js = String(FPSTR(PAGE_JS));
-  js.replace("%STATES%", states);
-  p += js;
-  p += "</body></html>";
-  return p;
+  j += "]";
+  return j;
 }
 
-// ── HTTP Handler ──────────────────────────────────────────────
+String buildStatesJson() {
+  String j = "[";
+  for (int i = 0; i < NUM_LIGHTS; i++) {
+    j += lightState[i] ? "true" : "false";
+    if (i < NUM_LIGHTS - 1) j += ",";
+  }
+  j += "]";
+  return j;
+}
 
 void handleRoot() {
-  server.send(200, "text/html; charset=utf-8", buildPage());
+  String page = String(FPSTR(PAGE));
+  page.replace("%LIGHTS%", buildLightsJson());
+  page.replace("%STATES%", buildStatesJson());
+  page.replace("%IP%", WiFi.softAPIP().toString());
+  server.send(200, "text/html; charset=utf-8", page);
 }
 
 void handleSet() {
@@ -264,32 +271,16 @@ void handleSet() {
 }
 
 void handleScene() {
-  if (!server.hasArg("id")) {
-    server.send(400, "application/json", "{\"error\":\"id\"}"); return;
-  }
+  if (!server.hasArg("id")) { server.send(400, "application/json", "{\"error\":\"id\"}"); return; }
   int id = server.arg("id").toInt();
-  if (id < 0 || id >= NUM_SCENES) {
-    server.send(400, "application/json", "{\"error\":\"range\"}"); return;
-  }
-  for (int i = 0; i < NUM_LIGHTS; i++) setRelay(i, SCENES[id].states[i]);
-
-  String json = "{\"scene\":" + String(id) + ",\"states\":[";
-  for (int i = 0; i < NUM_LIGHTS; i++) {
-    json += lightState[i] ? "true" : "false";
-    if (i < NUM_LIGHTS - 1) json += ",";
-  }
-  json += "]}";
-  server.send(200, "application/json", json);
+  if (id < 0 || id >= NUM_SCENES) { server.send(400, "application/json", "{\"error\":\"range\"}"); return; }
+  for (int i = 0; i < NUM_LIGHTS; i++) setRelay(i, SCENES[id][i]);
+  server.send(200, "application/json",
+    "{\"scene\":" + String(id) + ",\"states\":" + buildStatesJson() + "}");
 }
 
 void handleStatus() {
-  String json = "{\"lights\":[";
-  for (int i = 0; i < NUM_LIGHTS; i++) {
-    json += lightState[i] ? "true" : "false";
-    if (i < NUM_LIGHTS - 1) json += ",";
-  }
-  json += "]}";
-  server.send(200, "application/json", json);
+  server.send(200, "application/json", "{\"states\":" + buildStatesJson() + "}");
 }
 
 // ── Setup & Loop ──────────────────────────────────────────────
@@ -310,12 +301,11 @@ void setup() {
   Serial.print("WLAN:   "); Serial.println(SSID);
   Serial.print("PW:     "); Serial.println(PASSWORD);
   Serial.print("URL:    http://"); Serial.println(ip);
-  Serial.println("======================");
 
-  server.on("/",      handleRoot);
-  server.on("/set",   handleSet);
-  server.on("/scene", handleScene);
-  server.on("/status",handleStatus);
+  server.on("/",       handleRoot);
+  server.on("/set",    handleSet);
+  server.on("/scene",  handleScene);
+  server.on("/status", handleStatus);
   server.begin();
 }
 
