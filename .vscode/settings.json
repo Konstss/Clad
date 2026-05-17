@@ -1,0 +1,15 @@
+{
+  "livePreview.defaultPreviewPath": "/gnt_website.html",
+  "livePreview.openPreviewTarget": "Embedded Preview",
+  "livePreview.portNumber": 3000,
+  "livePreview.autoRefreshPreview": "On Changes to Saved Files",
+  "livePreview.tasks.runTaskWithExternalPreview": false,
+  "files.associations": {
+    "*.html": "html"
+  },
+  "html.format.indentInnerHtml": true,
+  "editor.formatOnSave": false,
+  "editor.fontFamily": "'SF Mono', Menlo, Monaco, 'Courier New', monospace",
+  "editor.bracketPairColorization.enabled": true,
+  "workbench.colorTheme": "Default Dark Modern"
+}
