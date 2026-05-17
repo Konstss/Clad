@@ -4,1814 +4,879 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#040a06">
-  <title>GNT Group — Natürliche Farben. Nachhaltige Zukunft.</title>
+  <meta name="theme-color" content="#eef5ee">
+  <title>GNT Group — EXBERRY® Pflanzliche Lebensmittelfarben</title>
+  <link rel="preconnect" href="https://api.fontshare.com">
+  <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@400,500,700,800,900&display=swap">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
   <style>
-    /* ════════════════════════════════════════════
-       CSS @PROPERTY — Animatable gradient stops
-    ════════════════════════════════════════════ */
-    @property --grad-angle {
-      syntax: '<angle>';
-      initial-value: 135deg;
-      inherits: false;
-    }
-    @property --orb-hue {
-      syntax: '<number>';
-      initial-value: 140;
-      inherits: false;
-    }
-
-    /* ════════════════════════════════════════════
-       BASE & VARIABLES
-    ════════════════════════════════════════════ */
+    /* ── RESET ─────────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    img, svg, canvas { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    button { background: none; border: none; cursor: pointer; font: inherit; }
+    ul, ol { list-style: none; }
 
+    /* ── TOKENS ────────────────────────────────────────────── */
     :root {
-      --bg:       #040a06;
-      --bg2:      #071009;
-      --surface:  rgba(255,255,255,0.04);
-      --surface2: rgba(255,255,255,0.07);
-      --border:   rgba(255,255,255,0.08);
-      --border2:  rgba(255,255,255,0.14);
-      --p:        #22c55e;
-      --p2:       #4ade80;
-      --p3:       #16a34a;
-      --text:     #edf7ee;
-      --muted:    #6b7d6c;
-      --muted2:   #9db09e;
-      --red:    #ef4444; --orange: #f97316; --yellow: #eab308;
-      --lime:   #84cc16; --green:  #22c55e; --teal:   #14b8a6;
-      --cyan:   #06b6d4; --blue:   #3b82f6; --indigo: #6366f1;
-      --purple: #8b5cf6; --pink:   #ec4899; --rose:   #f43f5e;
-      --radius: 18px;
-      --shadow: 0 20px 60px rgba(0,0,0,0.5);
-      /* Emil Kowalski recommended easing curves */
+      --bg:          oklch(0.97 0.010 145);
+      --bg2:         oklch(0.93 0.009 145);
+      --bg3:         oklch(0.90 0.011 145);
+      --fg:          oklch(0.14 0.018 145);
+      --fg2:         oklch(0.36 0.016 145);
+      --muted:       oklch(0.55 0.012 145);
+      --surface:     oklch(0.94 0.009 145);
+      --surface2:    oklch(0.91 0.010 145);
+      --border:      oklch(0.87 0.012 145);
+      --border2:     oklch(0.80 0.014 145);
+      --accent:      oklch(0.50 0.19 145);
+      --accent-dk:   oklch(0.38 0.17 145);
+      --accent-lt:   oklch(0.88 0.08 145);
+      --s-red:    oklch(0.55 0.22 25);
+      --s-orange: oklch(0.64 0.20 52);
+      --s-yellow: oklch(0.78 0.17 92);
+      --s-lime:   oklch(0.71 0.19 128);
+      --s-green:  oklch(0.56 0.20 145);
+      --s-teal:   oklch(0.58 0.16 186);
+      --s-blue:   oklch(0.54 0.18 238);
+      --s-purple: oklch(0.51 0.18 292);
       --ease-out:    cubic-bezier(0.23, 1, 0.32, 1);
-      --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
-      --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+      --ease-io:     cubic-bezier(0.77, 0, 0.175, 1);
+      --ease-quart:  cubic-bezier(0.5, 0, 0, 1);
+      --font-d: 'Cabinet Grotesk', 'Outfit', system-ui, sans-serif;
+      --font-b: 'Plus Jakarta Sans', 'Outfit', system-ui, sans-serif;
+      --py: clamp(5rem, 10vw, 8rem);
+      --px: clamp(1.5rem, 6vw, 5.5rem);
     }
 
-    html { scroll-behavior: smooth; }
-
+    /* ── BASE ──────────────────────────────────────────────── */
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
     body {
       background: var(--bg);
-      color: var(--text);
-      /* Apple HIG: SF Pro on iOS, system font fallback elsewhere */
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
-                   'Segoe UI', system-ui, 'Helvetica Neue', Arial, sans-serif;
-      font-feature-settings: "ss01", "cv11", "kern";
+      color: var(--fg);
+      font-family: var(--font-b);
+      line-height: 1.65;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      text-rendering: optimizeLegibility;
       overflow-x: hidden;
-      line-height: 1.6;
-      /* iOS: remove tap-highlight box, use our :active state */
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* iOS: prevent zoom on input focus (font-size >= 16px) */
-    input, select, textarea, button { font-size: 16px; }
-
-    /* ════════════════════════════════════════════
-       CANVAS / BG
-    ════════════════════════════════════════════ */
-    #hero-canvas {
-      position: absolute;
-      inset: 0;
-      z-index: 1;
-      pointer-events: none;
-      mix-blend-mode: screen;
+    /* ── SCROLL PROGRESS ───────────────────────────────────── */
+    #sp {
+      position: fixed; top: 0; left: 0;
+      height: 2px; width: 0;
+      background: var(--accent); z-index: 9999;
+      transition: width 0.1s linear;
     }
 
-    /* ════════════════════════════════════════════
-       SCROLL ANIMATIONS
-    ════════════════════════════════════════════ */
+    /* ── SHARED ────────────────────────────────────────────── */
+    .eyebrow {
+      display: inline-flex; align-items: center;
+      font-family: var(--font-b); font-size: 0.67rem; font-weight: 600;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--accent); background: var(--accent-lt);
+      border-radius: 9999px; padding: 5px 14px; margin-bottom: 1.25rem;
+    }
+    .sec-label {
+      font-family: var(--font-b); font-size: 0.67rem; font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 0.7rem;
+    }
+
+    /* ── BUTTONS ───────────────────────────────────────────── */
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--fg); color: var(--bg);
+      font-family: var(--font-b); font-size: 0.9rem; font-weight: 600;
+      padding: 0.75rem 1.6rem; border-radius: 9999px; letter-spacing: 0.01em;
+      transition: opacity 0.2s var(--ease-out), transform 0.15s var(--ease-out),
+                  box-shadow 0.2s;
+      box-shadow: 0 4px 20px oklch(0.14 0.018 145 / 0.18);
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .btn-primary:hover { opacity: 0.82; transform: translateY(-2px); box-shadow: 0 8px 28px oklch(0.14 0.018 145 / 0.24); }
+    }
+    .btn-primary:active { transform: scale(0.97) !important; transition-duration: 0.1s; }
+
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent; color: var(--fg2);
+      font-family: var(--font-b); font-size: 0.9rem; font-weight: 500;
+      padding: 0.75rem 1.4rem; border-radius: 9999px;
+      border: 1px solid var(--border2); letter-spacing: 0.01em;
+      transition: background 0.2s, border-color 0.2s, transform 0.15s var(--ease-out);
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .btn-ghost:hover { background: var(--surface); transform: translateY(-1px); }
+    }
+    .btn-ghost:active { transform: scale(0.97) !important; transition-duration: 0.1s; }
+
+    .btn-white {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--bg); color: var(--fg);
+      font-family: var(--font-b); font-size: 1rem; font-weight: 700;
+      padding: 0.9rem 2rem; border-radius: 9999px; letter-spacing: 0.01em;
+      transition: background 0.2s, transform 0.15s var(--ease-out), box-shadow 0.2s;
+      box-shadow: 0 6px 30px oklch(0.14 0.018 145 / 0.22);
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .btn-white:hover { background: oklch(0.99 0.005 145); transform: translateY(-2px); }
+    }
+    .btn-white:active { transform: scale(0.97) !important; transition-duration: 0.1s; }
+
+    /* ── REVEAL ────────────────────────────────────────────── */
     .reveal {
-      opacity: 0;
-      transform: translateY(40px);
-      transition: opacity 0.8s cubic-bezier(0.23,1,0.32,1),
-                  transform 0.8s cubic-bezier(0.23,1,0.32,1);
+      opacity: 0; transform: translateY(28px); filter: blur(4px);
+      transition: opacity 0.78s var(--ease-out), transform 0.78s var(--ease-out),
+                  filter 0.78s var(--ease-out);
     }
-    .reveal.visible { opacity: 1; transform: none; }
-    .reveal-left  { opacity: 0; transform: translateX(-50px); transition: opacity 0.8s cubic-bezier(0.23,1,0.32,1), transform 0.8s cubic-bezier(0.23,1,0.32,1); }
-    .reveal-right { opacity: 0; transform: translateX( 50px); transition: opacity 0.8s cubic-bezier(0.23,1,0.32,1), transform 0.8s cubic-bezier(0.23,1,0.32,1); }
-    .reveal-left.visible, .reveal-right.visible { opacity: 1; transform: none; }
+    .reveal.vis { opacity: 1; transform: none; filter: none; }
+    .reveal-l { opacity: 0; transform: translateX(-32px); filter: blur(3px);
+      transition: opacity 0.78s var(--ease-out), transform 0.78s var(--ease-out),
+                  filter 0.78s var(--ease-out); }
+    .reveal-r { opacity: 0; transform: translateX(32px); filter: blur(3px);
+      transition: opacity 0.78s var(--ease-out), transform 0.78s var(--ease-out),
+                  filter 0.78s var(--ease-out); }
+    .reveal-l.vis, .reveal-r.vis { opacity: 1; transform: none; filter: none; }
 
-    /* ════════════════════════════════════════════
-       NAV
-    ════════════════════════════════════════════ */
+    /* ── NAV ───────────────────────────────────────────────── */
     #nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 1000;
-      /* iOS HIG: respect safe area insets (iPhone notch / Dynamic Island) */
-      padding: env(safe-area-inset-top, 0) clamp(1.5rem, 4vw, 3rem) 0;
-      padding-left:  max(clamp(1.5rem, 4vw, 3rem), env(safe-area-inset-left));
-      padding-right: max(clamp(1.5rem, 4vw, 3rem), env(safe-area-inset-right));
-      min-height: 72px;
-      height: calc(72px + env(safe-area-inset-top, 0));
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      transition: background 0.4s, backdrop-filter 0.4s, border-color 0.4s;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      padding: env(safe-area-inset-top, 0px)
+               max(var(--px), env(safe-area-inset-right, 0px))
+               0
+               max(var(--px), env(safe-area-inset-left, 0px));
+      height: calc(66px + env(safe-area-inset-top, 0px));
+      display: flex; align-items: center; justify-content: space-between;
+      transition: background 0.4s var(--ease-out), backdrop-filter 0.4s, border-color 0.4s;
       border-bottom: 1px solid transparent;
     }
     #nav.scrolled {
-      background: rgba(4,10,6,0.78);
-      /* iOS HIG: stronger blur + saturation boost = native vibrancy feel */
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      background: oklch(0.97 0.010 145 / 0.84);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
       border-color: var(--border);
     }
-
-    .nav-logo {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0;
-      text-decoration: none;
+    .nav-logo { display: flex; flex-direction: column; align-items: flex-start; }
+    .nav-logo img { height: 24px; width: auto; }
+    .nav-byline {
+      font-size: 0.54rem; font-weight: 500; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--muted); margin-top: 2px;
     }
-    .nav-exberry-logo {
-      height: 30px;
-      width: auto;
-      display: block;
-    }
-    .nav-logo-mark {
-      width: 42px; height: 42px;
-      background: linear-gradient(135deg, var(--p3), var(--p2));
-      border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 900; font-size: 1rem;
-      color: #fff;
-      letter-spacing: -1px;
-      box-shadow: 0 0 24px rgba(34,197,94,0.35);
-      animation: logo-pulse 4s ease-in-out infinite;
-      flex-shrink: 0;
-    }
-    @keyframes logo-pulse {
-      0%,100% { box-shadow: 0 0 24px rgba(34,197,94,0.35); }
-      50%      { box-shadow: 0 0 40px rgba(74,222,128,0.55); }
-    }
-    .nav-logo-text { line-height: 1; }
-    .nav-logo-name {
-      font-size: 1.1rem; font-weight: 800;
-      background: linear-gradient(135deg, #fff 30%, var(--p2));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .nav-logo-sub {
-      font-size: 0.6rem; letter-spacing: 0.18em;
-      text-transform: uppercase; color: var(--muted2);
-      display: block; margin-top: 2px;
-    }
-
-    .nav-links {
-      display: flex; gap: 2rem; list-style: none;
-    }
+    .nav-links { display: flex; gap: 2rem; }
     @media (max-width: 860px) { .nav-links { display: none; } }
     .nav-links a {
-      font-size: 0.88rem; font-weight: 500; color: var(--muted2);
-      text-decoration: none; transition: color 0.2s;
+      font-size: 0.85rem; font-weight: 500; color: var(--fg2);
+      transition: color 0.18s;
     }
-    .nav-links a:hover { color: var(--text); }
-
+    @media (hover: hover) and (pointer: fine) { .nav-links a:hover { color: var(--fg); } }
     .nav-cta {
-      background: linear-gradient(135deg, var(--p3), var(--p));
-      border: none; border-radius: 10px;
-      color: #fff; font-size: 0.88rem; font-weight: 700;
-      padding: 0.55rem 1.3rem; cursor: pointer;
-      transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
-      box-shadow: 0 4px 16px rgba(22,163,74,0.3);
-      letter-spacing: 0.02em; font-family: inherit;
-      text-decoration: none; display: inline-block;
+      font-family: var(--font-b); font-size: 0.82rem; font-weight: 600;
+      color: var(--bg); background: var(--fg);
+      padding: 0.5rem 1.2rem; border-radius: 9999px;
+      transition: opacity 0.18s, transform 0.15s var(--ease-out);
     }
     @media (hover: hover) and (pointer: fine) {
-      .nav-cta:hover {
-        opacity: 0.9; transform: translateY(-1px);
-        box-shadow: 0 6px 24px rgba(22,163,74,0.45);
-      }
+      .nav-cta:hover { opacity: 0.8; transform: translateY(-1px); }
     }
     .nav-cta:active { transform: scale(0.97); transition-duration: 0.1s; }
 
-    /* All clickable elements get press feedback (Emil rule) */
-    .preset-btn:active, .page-btn:active, .view-btn:active,
-    .pill:active {
-      transform: scale(0.97);
-      transition-duration: 0.1s;
-    }
-
-    /* ════════════════════════════════════════════
-       HERO
-    ════════════════════════════════════════════ */
+    /* ── HERO ──────────────────────────────────────────────── */
     #hero {
-      position: relative;
-      min-height: 100vh;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      text-align: center;
-      padding: 0 clamp(1.5rem, 5vw, 4rem);
+      min-height: 100dvh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      padding-top: calc(66px + env(safe-area-inset-top, 0px));
       overflow: hidden;
     }
-
-    .hero-bg-glow {
-      position: absolute; inset: 0; z-index: 0; pointer-events: none;
-      background:
-        radial-gradient(ellipse 70% 55% at 50% 0%, rgba(34,197,94,0.14) 0%, transparent 65%),
-        radial-gradient(ellipse 50% 40% at 20% 80%, rgba(132,204,22,0.09) 0%, transparent 55%),
-        radial-gradient(ellipse 45% 35% at 80% 70%, rgba(20,184,166,0.08) 0%, transparent 50%);
+    @media (max-width: 860px) {
+      #hero { grid-template-columns: 1fr; min-height: auto; }
     }
 
-    .hero-content { position: relative; z-index: 2; max-width: 920px; }
-
-    .hero-eyebrow {
-      display: inline-flex; align-items: center; gap: 8px;
-      font-size: 0.72rem; font-weight: 700;
-      letter-spacing: 0.15em; text-transform: uppercase;
-      color: var(--p);
-      background: rgba(34,197,94,0.1);
-      border: 1px solid rgba(34,197,94,0.25);
-      border-radius: 20px; padding: 5px 16px;
-      margin-bottom: 1.5rem;
-      animation: fadeDown 0.8s 0.1s cubic-bezier(0.23,1,0.32,1) both;
-    }
-    @keyframes fadeDown {
-      from { opacity:0; transform:translateY(-20px); }
-      to   { opacity:1; transform:translateY(0); }
+    .hero-left {
+      display: flex; flex-direction: column; justify-content: center;
+      padding: clamp(3rem, 7vw, 6rem) var(--px);
+      padding-left: max(var(--px), env(safe-area-inset-left, 0px));
     }
 
-    .hero-title {
-      font-size: clamp(2.8rem, 7vw, 5.5rem);
-      font-weight: 900; line-height: 1.05;
-      letter-spacing: -0.025em;
-      margin-bottom: 1.5rem;
-      animation: fadeUp 0.9s 0.2s cubic-bezier(0.23,1,0.32,1) both;
+    .hero-h1 {
+      font-family: var(--font-d);
+      font-size: clamp(2.8rem, 5.2vw, 4.8rem);
+      font-weight: 900; line-height: 1.02; letter-spacing: -0.03em;
+      color: var(--fg); margin-bottom: 1.5rem;
     }
-    @keyframes fadeUp {
-      from { opacity:0; transform:translateY(35px); }
-      to   { opacity:1; transform:translateY(0); }
-    }
-
-    .hero-title .line-green {
-      background: linear-gradient(135deg, var(--lime), var(--p), var(--teal));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .hero-title .line-spectrum {
-      background: linear-gradient(90deg,
-        var(--red), var(--orange), var(--yellow),
-        var(--green), var(--blue), var(--purple));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-size: 200% auto;
-      animation: spectrum-flow 4s linear infinite;
-    }
-    @keyframes spectrum-flow {
-      0%   { background-position: 0% center; }
-      100% { background-position: 200% center; }
-    }
+    .hero-h1 .hl { color: var(--accent); }
 
     .hero-sub {
-      font-size: clamp(1rem, 2.5vw, 1.25rem);
-      color: var(--muted2); max-width: 620px;
-      margin: 0 auto 2.5rem;
-      line-height: 1.75;
-      animation: fadeUp 0.9s 0.35s cubic-bezier(0.23,1,0.32,1) both;
+      font-size: clamp(0.95rem, 1.4vw, 1.1rem); color: var(--fg2);
+      max-width: 52ch; line-height: 1.78; margin-bottom: 2.5rem;
     }
 
-    .hero-actions {
-      display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
-      animation: fadeUp 0.9s 0.5s cubic-bezier(0.23,1,0.32,1) both;
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, var(--p3), var(--p));
-      border: none; border-radius: 12px;
-      color: #fff; font-size: 1rem; font-weight: 700;
-      padding: 0.9rem 2.2rem; cursor: pointer;
-      text-decoration: none; display: inline-block;
-      transition: opacity .2s, transform .15s, box-shadow .2s;
-      box-shadow: 0 6px 24px rgba(22,163,74,0.4);
-      letter-spacing: 0.03em; font-family: inherit;
-    }
-    @media (hover: hover) and (pointer: fine) {
-      .btn-primary:hover { opacity:.9; transform:translateY(-2px); box-shadow:0 10px 32px rgba(22,163,74,0.5); }
-    }
-    .btn-primary:active { transform: scale(0.97); transition-duration: 0.1s; }
+    .hero-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
 
-    .btn-ghost {
-      background: var(--surface);
-      border: 1px solid var(--border2);
-      border-radius: 12px;
-      color: var(--text); font-size: 1rem; font-weight: 600;
-      padding: 0.9rem 2.2rem; cursor: pointer;
-      text-decoration: none; display: inline-block;
-      transition: background .2s, border-color .2s, transform .15s;
-      letter-spacing: 0.03em; font-family: inherit;
-      backdrop-filter: blur(8px);
+    .hero-right {
+      position: relative; background: var(--bg2);
+      display: flex; align-items: stretch; overflow: hidden;
     }
-    @media (hover: hover) and (pointer: fine) {
-      .btn-ghost:hover { background:var(--surface2); border-color:rgba(255,255,255,0.2); transform:translateY(-2px); }
-    }
-    .btn-ghost:active { transform: scale(0.97); transition-duration: 0.1s; }
-
-    .hero-scroll {
-      position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
-      display: flex; flex-direction: column; align-items: center; gap: 6px;
-      color: var(--muted); font-size: 0.72rem; letter-spacing: 0.1em;
-      text-transform: uppercase; z-index: 1;
-      animation: fadeUp 1s 0.9s both;
-    }
-    .scroll-arrow {
-      width: 24px; height: 24px;
-      border-right: 2px solid var(--muted);
-      border-bottom: 2px solid var(--muted);
-      transform: rotate(45deg);
-      animation: bounce 2s ease-in-out infinite;
-    }
-    @keyframes bounce {
-      0%,100% { transform:rotate(45deg) translateY(0); }
-      50%      { transform:rotate(45deg) translateY(5px); }
+    @media (max-width: 860px) {
+      .hero-right { height: 60vw; min-height: 260px; }
     }
 
-    /* ════════════════════════════════════════════
-       SPECTRUM BAR (divider)
-    ════════════════════════════════════════════ */
-    .spectrum-bar {
-      height: 4px;
-      background: linear-gradient(90deg,
-        var(--red), var(--orange), var(--yellow),
-        var(--lime), var(--green), var(--teal),
-        var(--cyan), var(--blue), var(--indigo),
-        var(--purple), var(--pink), var(--rose));
-      background-size: 200% auto;
-      animation: spectrum-flow 6s linear infinite;
+    #hero-canvas {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      mix-blend-mode: multiply;
+      pointer-events: none;
     }
 
-    /* ════════════════════════════════════════════
-       SECTIONS
-    ════════════════════════════════════════════ */
-    section {
-      padding: clamp(4rem, 8vw, 7rem) clamp(1.5rem, 5vw, 5rem);
-      max-width: 1300px;
-      margin: 0 auto;
-    }
-    .section-full {
-      max-width: none;
-      padding-left: 0; padding-right: 0;
-    }
-    .section-full > .inner {
-      max-width: 1300px;
-      margin: 0 auto;
-      padding: 0 clamp(1.5rem, 5vw, 5rem);
-    }
-
-    .section-label {
-      display: inline-flex; align-items: center; gap: 8px;
-      font-size: 0.7rem; font-weight: 700;
+    .hero-canvas-label {
+      position: absolute; bottom: 1.25rem; left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.63rem; font-weight: 500;
       letter-spacing: 0.15em; text-transform: uppercase;
-      color: var(--p);
-      margin-bottom: 1rem;
-    }
-    .section-label::before {
-      content: '';
-      display: block; width: 18px; height: 2px;
-      background: var(--p); border-radius: 1px;
+      color: var(--muted); white-space: nowrap; z-index: 1;
     }
 
-    .section-title {
-      font-size: clamp(2rem, 4.5vw, 3.2rem);
-      font-weight: 900; line-height: 1.1;
-      letter-spacing: -0.02em; margin-bottom: 1.2rem;
-    }
-    .section-title .hl {
-      background: linear-gradient(135deg, var(--p2), var(--teal));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .section-desc {
-      font-size: 1.05rem; color: var(--muted2);
-      max-width: 580px; line-height: 1.75;
-    }
-
-    /* ════════════════════════════════════════════
-       STATS BAR
-    ════════════════════════════════════════════ */
-    #stats {
-      background: var(--bg2);
+    /* ── STATEMENT ─────────────────────────────────────────── */
+    #statement {
+      padding: var(--py) var(--px);
       border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      max-width: none;
-      padding: 0;
+      background: var(--bg);
     }
-    .stats-inner {
-      max-width: 1300px; margin: 0 auto;
+    .statement-h {
+      font-family: var(--font-d);
+      font-size: clamp(2.8rem, 7vw, 6.5rem);
+      font-weight: 900; letter-spacing: -0.035em; line-height: 1.0;
+      color: var(--fg); margin-bottom: 2rem; max-width: 16ch;
+    }
+    .statement-sub {
+      font-size: clamp(1rem, 1.4vw, 1.1rem); color: var(--fg2);
+      max-width: 58ch; line-height: 1.8;
+    }
+
+    /* ── COLORS (Horizontal Scroll) ────────────────────────── */
+    #colors { padding: var(--py) 0; background: var(--bg); overflow: hidden; }
+    .colors-head {
+      padding: 0 var(--px); margin-bottom: 3rem;
+      display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem;
+    }
+    .colors-head h2 {
+      font-family: var(--font-d);
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      font-weight: 800; letter-spacing: -0.025em; line-height: 1.1;
+      color: var(--fg); max-width: 22ch;
+    }
+    .colors-hint { font-size: 0.78rem; color: var(--muted); font-weight: 500; }
+
+    .colors-scroll {
+      padding: 0 var(--px) 1rem;
+      overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none;
+      cursor: grab; -webkit-overflow-scrolling: touch;
+    }
+    .colors-scroll::-webkit-scrollbar { display: none; }
+    .colors-scroll.grabbing { cursor: grabbing; }
+
+    .colors-strip { display: flex; gap: 1rem; width: max-content; }
+
+    .cc {
+      width: 210px; flex-shrink: 0;
+      border-radius: 18px; overflow: hidden;
+      background: var(--surface); border: 1px solid var(--border);
+      transition: transform 0.3s var(--ease-out), box-shadow 0.3s;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .cc:hover { transform: translateY(-7px); box-shadow: 0 18px 44px oklch(0.14 0.018 145 / 0.13); }
+    }
+    .cc-swatch { height: 150px; }
+    .cc-body { padding: 1rem 1rem 1.2rem; }
+    .cc-name {
+      font-family: var(--font-d); font-size: 0.9rem; font-weight: 800;
+      color: var(--fg); margin-bottom: 0.3rem; letter-spacing: -0.01em;
+    }
+    .cc-src { font-size: 0.73rem; color: var(--muted); font-weight: 500; }
+
+    /* ── BENTO (Why EXBERRY) ───────────────────────────────── */
+    #why { padding: var(--py) var(--px); background: var(--bg2); }
+    #why .why-head { margin-bottom: 3rem; }
+    #why h2 {
+      font-family: var(--font-d);
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      font-weight: 800; letter-spacing: -0.025em; line-height: 1.1; color: var(--fg);
+    }
+
+    .bento {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 0;
+      grid-template-columns: 1.6fr 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 1rem; max-width: 1200px;
     }
-    .stat-item {
-      padding: 2.5rem 2rem;
-      text-align: center;
-      border-right: 1px solid var(--border);
-      position: relative;
-      transition: background 0.3s;
+    @media (max-width: 1024px) {
+      .bento { grid-template-columns: 1fr 1fr; }
+      .bento-feat { grid-column: 1 / -1; grid-row: auto; }
     }
-    .stat-item:last-child { border-right: none; }
-    .stat-item:hover { background: var(--surface); }
-
-    @media (max-width: 700px) {
-      .stats-inner { grid-template-columns: 1fr 1fr; }
-      .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
-      .stat-item:last-child { border-bottom: none; }
-    }
-
-    .stat-number {
-      font-size: clamp(2.5rem, 5vw, 3.5rem);
-      font-weight: 900; line-height: 1;
-      background: linear-gradient(135deg, var(--p2), var(--teal));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      margin-bottom: 0.4rem;
-    }
-    .stat-label {
-      font-size: 0.82rem; color: var(--muted2);
-      text-transform: uppercase; letter-spacing: 0.1em;
-    }
-
-    /* ════════════════════════════════════════════
-       ABOUT
-    ════════════════════════════════════════════ */
-    .about-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: clamp(2rem, 5vw, 5rem);
-      align-items: center;
-    }
-    @media (max-width: 800px) { .about-grid { grid-template-columns: 1fr; } }
-
-    .about-visual {
-      position: relative;
-      aspect-ratio: 1;
-      max-width: 500px;
-    }
-
-    .about-orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(0);
-      animation: orb-float linear infinite;
-    }
-    @keyframes orb-float {
-      0%, 100% { transform: translateY(0) scale(1); }
-      33%       { transform: translateY(-15px) scale(1.04); }
-      66%       { transform: translateY(8px) scale(0.97); }
-    }
-
-    .orb-main {
-      inset: 10%;
-      background: radial-gradient(circle at 35% 35%,
-        rgba(74,222,128,0.25), rgba(34,197,94,0.12),
-        rgba(20,184,166,0.08), transparent 70%);
-      border: 1px solid rgba(74,222,128,0.15);
-      animation-duration: 8s;
-    }
-    .orb-red   { top:5%;  left:60%; width:30%; height:30%; background:radial-gradient(circle, rgba(239,68,68,0.3), transparent 70%);  animation-duration:6s;  animation-delay:-2s; }
-    .orb-orange{ bottom:15%; left:5%;  width:25%; height:25%; background:radial-gradient(circle, rgba(249,115,22,0.25), transparent 70%); animation-duration:7s;  animation-delay:-1s; }
-    .orb-blue  { bottom:5%; right:10%;width:28%; height:28%; background:radial-gradient(circle, rgba(59,130,246,0.25), transparent 70%); animation-duration:9s;  animation-delay:-3s; }
-    .orb-purple{ top:10%; left:10%; width:22%; height:22%; background:radial-gradient(circle, rgba(139,92,246,0.3),  transparent 70%); animation-duration:5.5s;animation-delay:-0.5s;}
-    .orb-yellow{ top:55%; left:40%; width:20%; height:20%; background:radial-gradient(circle, rgba(234,179,8,0.3),   transparent 70%); animation-duration:7.5s;animation-delay:-4s; }
-
-    .about-logo-center {
-      position: absolute; top:50%; left:50%;
-      transform: translate(-50%, -50%);
-      z-index: 2;
-    }
-    .about-logo-circle {
-      width: 120px; height: 120px;
-      background: rgba(10,20,12,0.8);
-      border: 1px solid rgba(74,222,128,0.3);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 0 60px rgba(34,197,94,0.2), inset 0 0 30px rgba(34,197,94,0.05);
-    }
-    .about-logo-text {
-      font-size: 1.8rem; font-weight: 900; letter-spacing: -2px;
-      background: linear-gradient(135deg, var(--p2), #fff);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-
-    .timeline {
-      display: flex; flex-direction: column; gap: 1.5rem;
-      margin-top: 2.5rem;
-    }
-    .timeline-item {
-      display: flex; gap: 1.2rem; align-items: flex-start;
-      position: relative;
-    }
-    .timeline-item::before {
-      content: '';
-      position: absolute; left: 19px; top: 36px;
-      width: 1px; height: calc(100% + 1rem);
-      background: linear-gradient(to bottom, var(--border2), transparent);
-    }
-    .timeline-item:last-child::before { display: none; }
-    .timeline-dot {
-      width: 38px; height: 38px; border-radius: 50%;
-      background: var(--surface2);
-      border: 2px solid var(--p3);
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; font-size: 0.75rem; font-weight: 700;
-      color: var(--p); letter-spacing: -0.5px;
-    }
-    .timeline-body { padding-top: 6px; }
-    .timeline-year { font-size: 0.7rem; font-weight: 700; color: var(--p); letter-spacing: 0.1em; text-transform: uppercase; }
-    .timeline-text { font-size: 0.9rem; color: var(--muted2); margin-top: 2px; line-height: 1.55; }
-
-    /* ════════════════════════════════════════════
-       EXBERRY COLORS SECTION
-    ════════════════════════════════════════════ */
-    #colors-section {
-      background: var(--bg2);
-      max-width: none; padding: 0;
-    }
-    #colors-section .inner {
-      padding: clamp(4rem,8vw,7rem) clamp(1.5rem,5vw,5rem);
-      max-width: 1300px; margin: 0 auto;
-    }
-
-    .colors-header {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 2rem;
-      align-items: end;
-      margin-bottom: 3rem;
-    }
-    @media (max-width:700px) { .colors-header { grid-template-columns:1fr; } }
-
-    .exberry-badge {
-      display: inline-flex; align-items: center; gap: 8px;
-      font-size: 1.1rem; font-weight: 800;
-      color: #fff;
-      background: linear-gradient(135deg, #1a6b35, #0d4a26);
-      border: 1px solid rgba(74,222,128,0.3);
-      border-radius: 10px; padding: 8px 18px;
-      letter-spacing: 0.04em;
-    }
-    .exberry-badge .r { color: var(--p2); }
-
-    .color-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-      gap: 1rem;
-    }
-
-    .color-card {
-      border-radius: var(--radius);
-      overflow: hidden;
-      cursor: default;
-      transition: transform 0.3s cubic-bezier(0.23,1,0.32,1), box-shadow 0.3s;
-      border: 1px solid var(--border);
-    }
-    .color-card:hover {
-      transform: translateY(-6px) scale(1.02);
-      box-shadow: var(--shadow);
-    }
-    .color-swatch {
-      height: 110px;
-      position: relative;
-      overflow: hidden;
-    }
-    .color-swatch::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.35));
-    }
-    .color-swatch-orb {
-      position: absolute;
-      width: 80%; height: 80%;
-      top: 10%; left: 10%;
-      border-radius: 50%;
-      filter: blur(12px);
-      animation: orb-pulse 3s ease-in-out infinite;
-    }
-    @keyframes orb-pulse {
-      0%,100% { transform: scale(1);   opacity: 0.85; }
-      50%      { transform: scale(1.1); opacity: 1;    }
-    }
-
-    .color-info {
-      background: var(--surface);
-      padding: 0.85rem 1rem;
-      border-top: 1px solid var(--border);
-    }
-    .color-name { font-size: 0.85rem; font-weight: 700; color: var(--text); }
-    .color-source { font-size: 0.72rem; color: var(--muted2); margin-top: 2px; }
-
-    /* ════════════════════════════════════════════
-       APPLICATIONS
-    ════════════════════════════════════════════ */
-    .app-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 1.2rem;
-      margin-top: 3rem;
-    }
-
-    .app-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.6rem 1.4rem;
-      transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s, background 0.25s;
-      cursor: default;
-      position: relative;
-      overflow: hidden;
-    }
-    .app-card::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(135deg, var(--card-color, rgba(34,197,94,0.06)), transparent);
-      opacity: 0; transition: opacity 0.3s;
-    }
-    .app-card:hover {
-      border-color: var(--card-color, rgba(34,197,94,0.4));
-      transform: translateY(-4px);
-      box-shadow: 0 12px 40px rgba(0,0,0,0.3);
-    }
-    .app-card:hover::before { opacity: 1; }
-
-    .app-icon {
-      font-size: 2.2rem; margin-bottom: 1rem; display: block;
-      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.3));
-    }
-    .app-name {
-      font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 0.4rem;
-    }
-    .app-desc { font-size: 0.82rem; color: var(--muted2); line-height: 1.55; }
-
-    /* ════════════════════════════════════════════
-       WHY EXBERRY / USPs
-    ════════════════════════════════════════════ */
-    #why-section {
-      background: linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%);
-      max-width: none; padding: 0;
-    }
-    #why-section .inner {
-      padding: clamp(4rem,8vw,7rem) clamp(1.5rem,5vw,5rem);
-      max-width: 1300px; margin: 0 auto;
-    }
-
-    .usp-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 1.3rem;
-      margin-top: 3rem;
-    }
-    .usp-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 2rem;
-      transition: border-color 0.25s, background 0.25s, transform 0.25s, box-shadow 0.25s;
-    }
-    .usp-card:hover {
-      border-color: rgba(74,222,128,0.3);
-      background: var(--surface2);
-      transform: translateY(-3px);
-      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-    }
-    .usp-icon-wrap {
-      width: 52px; height: 52px;
-      background: rgba(34,197,94,0.1);
-      border: 1px solid rgba(34,197,94,0.2);
-      border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.6rem;
-      margin-bottom: 1.2rem;
-    }
-    .usp-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; }
-    .usp-text { font-size: 0.85rem; color: var(--muted2); line-height: 1.65; }
-
-    /* ════════════════════════════════════════════
-       SUSTAINABILITY
-    ════════════════════════════════════════════ */
-    .sustain-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: clamp(2rem,5vw,5rem);
-      align-items: start;
-      margin-top: 3rem;
-    }
-    @media (max-width:800px) { .sustain-grid { grid-template-columns: 1fr; } }
-
-    .sustain-goals { display: flex; flex-direction: column; gap: 1.4rem; }
-    .goal-item {}
-    .goal-header {
-      display: flex; justify-content: space-between;
-      align-items: baseline; margin-bottom: 0.5rem;
-    }
-    .goal-name { font-size: 0.88rem; font-weight: 600; color: var(--text); }
-    .goal-target {
-      font-size: 0.8rem; color: var(--p);
-      font-weight: 700;
-    }
-    .goal-bar-track {
-      height: 8px; border-radius: 4px;
-      background: rgba(255,255,255,0.07);
-      overflow: hidden;
-    }
-    .goal-bar {
-      height: 100%; border-radius: 4px;
-      background: linear-gradient(90deg, var(--p3), var(--p2));
-      width: 0%;
-      transition: width 1.4s cubic-bezier(0.23,1,0.32,1);
-      position: relative;
-    }
-    .goal-bar::after {
-      content: '';
-      position: absolute; right: 0; top: 0; bottom: 0; width: 20px;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25));
-      animation: shimmer-bar 2s linear infinite;
-    }
-    @keyframes shimmer-bar {
-      0%  { opacity:0; }
-      50% { opacity:1; }
-      100%{ opacity:0; }
-    }
-    .goal-note { font-size: 0.73rem; color: var(--muted); margin-top: 0.3rem; }
-
-    .sustain-facts {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
-    }
-    .sfact {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 1.4rem;
-      transition: border-color 0.2s, background 0.2s;
-    }
-    .sfact:hover { border-color: rgba(34,197,94,0.3); background:var(--surface2); }
-    .sfact-icon { font-size: 1.8rem; margin-bottom: 0.7rem; display: block; }
-    .sfact-val {
-      font-size: 1.5rem; font-weight: 900;
-      background: linear-gradient(135deg, var(--p2), var(--teal));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      margin-bottom: 0.25rem;
-    }
-    .sfact-label { font-size: 0.78rem; color: var(--muted2); line-height: 1.4; }
-
-    /* ════════════════════════════════════════════
-       INNOVATION
-    ════════════════════════════════════════════ */
-    #innovation {
-      background: var(--bg2);
-      max-width: none; padding: 0;
-    }
-    #innovation .inner {
-      padding: clamp(4rem,8vw,7rem) clamp(1.5rem,5vw,5rem);
-      max-width: 1300px; margin: 0 auto;
-    }
-
-    .innov-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 1.5rem;
-      margin-top: 3rem;
-    }
-    @media (max-width:900px) { .innov-grid { grid-template-columns: 1fr; } }
-
-    .innov-main {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 2.5rem;
-      position: relative; overflow: hidden;
-      transition: border-color 0.3s, box-shadow 0.3s;
-    }
-    .innov-main:hover {
-      border-color: rgba(34,197,94,0.3);
-      box-shadow: 0 16px 50px rgba(0,0,0,0.4);
-    }
-    .innov-main-bg {
-      position: absolute; inset: 0; pointer-events: none;
-      background: radial-gradient(ellipse 80% 60% at 100% 0%, rgba(34,197,94,0.06), transparent 60%);
-    }
-    .innov-tag {
-      display: inline-block;
-      font-size: 0.68rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.1em;
-      color: var(--p); background: rgba(34,197,94,0.1);
-      border: 1px solid rgba(34,197,94,0.25);
-      border-radius: 6px; padding: 3px 10px;
-      margin-bottom: 1rem;
-    }
-    .innov-main h3 {
-      font-size: 1.6rem; font-weight: 800;
-      margin-bottom: 0.8rem; line-height: 1.2;
-    }
-    .innov-main p { font-size: 0.9rem; color: var(--muted2); line-height: 1.7; }
-
-    .innov-side { display: flex; flex-direction: column; gap: 1.5rem; }
-    .innov-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-      flex: 1;
-      transition: border-color 0.25s, background 0.25s, transform 0.25s, box-shadow 0.25s;
-    }
-    .innov-card:hover { border-color: rgba(34,197,94,0.25); background:var(--surface2); }
-    .innov-card h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.4rem; }
-    .innov-card p  { font-size: 0.82rem; color: var(--muted2); line-height: 1.6; }
-
-    /* ════════════════════════════════════════════
-       GLOBAL PRESENCE
-    ════════════════════════════════════════════ */
-    .global-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 1.2rem;
-      margin-top: 3rem;
-    }
-    .region-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.8rem 1.5rem;
-      text-align: center;
-      transition: border-color 0.25s, background 0.25s, transform 0.25s, box-shadow 0.25s;
-      cursor: default;
-    }
-    .region-card:hover {
-      border-color: rgba(74,222,128,0.3);
-      transform: translateY(-4px);
-      box-shadow: 0 12px 35px rgba(0,0,0,0.35);
-    }
-    .region-flag { font-size: 2.5rem; margin-bottom: 0.8rem; display: block; }
-    .region-name { font-size: 0.95rem; font-weight: 700; color: var(--text); margin-bottom: 0.3rem; }
-    .region-cities { font-size: 0.78rem; color: var(--muted2); line-height: 1.55; }
-
-    /* ════════════════════════════════════════════
-       QUOTE/MISSION BANNER
-    ════════════════════════════════════════════ */
-    #mission-banner {
-      background: linear-gradient(135deg, #0a1f0e 0%, #0d1a10 50%, #091808 100%);
-      border-top: 1px solid rgba(34,197,94,0.15);
-      border-bottom: 1px solid rgba(34,197,94,0.15);
-      max-width: none; padding: 0;
-    }
-    #mission-banner .inner {
-      max-width: 1300px; margin: 0 auto;
-      padding: clamp(3rem,6vw,5rem) clamp(1.5rem,5vw,5rem);
-      text-align: center;
-    }
-    .mission-quote {
-      font-size: clamp(1.4rem, 3.5vw, 2.2rem);
-      font-weight: 800; line-height: 1.3;
-      max-width: 800px; margin: 0 auto 1.5rem;
-    }
-    .mission-quote .hl-green {
-      color: var(--p2);
-    }
-    .mission-author { font-size: 0.85rem; color: var(--muted2); }
-
-    /* ════════════════════════════════════════════
-       CTA SECTION
-    ════════════════════════════════════════════ */
-    #cta-section {
-      max-width: none; padding: 0;
-      background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(34,197,94,0.07), transparent 70%);
-    }
-    #cta-section .inner {
-      max-width: 1300px; margin: 0 auto;
-      padding: clamp(5rem,10vw,8rem) clamp(1.5rem,5vw,5rem);
-      text-align: center;
-    }
-    .cta-title {
-      font-size: clamp(2rem, 5vw, 3.5rem);
-      font-weight: 900; line-height: 1.1;
-      letter-spacing: -0.02em; margin-bottom: 1.2rem;
-    }
-    .cta-sub {
-      font-size: 1.1rem; color: var(--muted2);
-      max-width: 500px; margin: 0 auto 2.5rem;
-      line-height: 1.7;
-    }
-    .cta-actions {
-      display: flex; gap: 1rem;
-      justify-content: center; flex-wrap: wrap;
-    }
-
-    /* ════════════════════════════════════════════
-       FOOTER
-    ════════════════════════════════════════════ */
-    footer {
-      background: var(--bg2);
-      border-top: 1px solid var(--border);
-      /* iOS HIG: respect home indicator safe area */
-      padding: 3rem clamp(1.5rem,5vw,5rem) calc(2rem + env(safe-area-inset-bottom, 0));
-      padding-left:  max(clamp(1.5rem,5vw,5rem), env(safe-area-inset-left));
-      padding-right: max(clamp(1.5rem,5vw,5rem), env(safe-area-inset-right));
-    }
-    .footer-inner {
-      max-width: 1300px; margin: 0 auto;
-    }
-    .footer-top {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr;
-      gap: 3rem;
-      margin-bottom: 3rem;
-    }
-    @media (max-width:900px) {
-      .footer-top { grid-template-columns: 1fr 1fr; gap: 2rem; }
-    }
-    @media (max-width:560px) {
-      .footer-top { grid-template-columns: 1fr; }
-    }
-
-    .footer-brand .logo-name { font-size: 1.3rem; }
-    .footer-tagline { font-size: 0.85rem; color: var(--muted2); margin-top: 0.8rem; line-height: 1.65; max-width: 260px; }
-
-    .footer-col-title {
-      font-size: 0.72rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.12em;
-      color: var(--muted); margin-bottom: 1rem;
-    }
-    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 0.55rem; }
-    .footer-links a { font-size: 0.85rem; color: var(--muted2); text-decoration: none; transition: color 0.2s; }
-    .footer-links a:hover { color: var(--text); }
-
-    .footer-bottom {
-      border-top: 1px solid var(--border);
-      padding-top: 1.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1rem;
-      font-size: 0.78rem;
-      color: var(--muted);
-    }
-    .footer-bottom .logo-name { font-size: 0.9rem; }
-
-    /* ════════════════════════════════════════════
-       TOUCH DEVICE — disable hover false-positives
-       (Emil principle: hover triggered on tap is wrong)
-    ════════════════════════════════════════════ */
-    @media (hover: none), (pointer: coarse) {
-      .deal-card:hover, .color-card:hover, .app-card:hover,
-      .usp-card:hover, .region-card:hover, .innov-card:hover,
-      .innov-main:hover, .sfact:hover, .stat-item:hover,
-      .pill:hover, .preset-btn:hover, .page-btn:hover,
-      .view-btn:hover, .wf-item:hover {
-        transform: none;
-        box-shadow: inherit;
-      }
-      .color-card:hover .color-swatch-orb {
-        transform: none;
-        filter: blur(12px);
-      }
-      .deal-card:hover .card-img { transform: none; }
-    }
-
-    /* ════════════════════════════════════════════
-       SCROLL PROGRESS BAR
-    ════════════════════════════════════════════ */
-    #scroll-progress {
-      position: fixed;
-      top: 0; left: 0;
-      height: 3px;
-      width: 0%;
-      z-index: 2000;
-      background: linear-gradient(90deg,
-        var(--red), var(--orange), var(--yellow),
-        var(--lime), var(--green), var(--teal),
-        var(--cyan), var(--blue), var(--purple));
-      transition: width 0.1s linear;
-      pointer-events: none;
-    }
-
-    /* ════════════════════════════════════════════
-       RIPPLE EFFECT
-    ════════════════════════════════════════════ */
-    .ripple-host { position: relative; overflow: hidden; }
-    .ripple {
-      position: absolute;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.25);
-      transform: scale(0);
-      animation: ripple-expand 0.55s cubic-bezier(0.25,1,0.5,1) forwards;
-      pointer-events: none;
-    }
-    @keyframes ripple-expand {
-      to { transform: scale(4); opacity: 0; }
-    }
-
-    /* ════════════════════════════════════════════
-       MAGNETIC BUTTON WRAPPER
-    ════════════════════════════════════════════ */
-    .magnetic-wrap { display: inline-block; }
-
-    /* ════════════════════════════════════════════
-       COLOR CARD BLOOM
-    ════════════════════════════════════════════ */
-    .color-card .color-swatch-orb {
-      transition: transform 0.4s cubic-bezier(0.23,1,0.32,1),
-                  filter 0.4s cubic-bezier(0.23,1,0.32,1);
-    }
-    .color-card:hover .color-swatch-orb {
-      transform: scale(1.35) translateY(-10%);
-      filter: blur(8px) brightness(1.3);
-    }
-
-    /* ════════════════════════════════════════════
-       HERO TITLE — @property gradient shimmer
-    ════════════════════════════════════════════ */
-    .hero-title .line-spectrum {
-      background: linear-gradient(var(--grad-angle),
-        var(--red), var(--orange), var(--yellow),
-        var(--green), var(--blue), var(--purple));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: grad-rotate 6s linear infinite;
-    }
-    @keyframes grad-rotate {
-      from { --grad-angle: 0deg;   }
-      to   { --grad-angle: 360deg; }
-    }
-
-    /* ════════════════════════════════════════════
-       STAT NUMBER — pulse on complete
-    ════════════════════════════════════════════ */
-    .stat-number.done {
-      animation: stat-pulse 0.4s cubic-bezier(0.23,1,0.32,1);
-    }
-    @keyframes stat-pulse {
-      0%   { transform: scale(1); }
-      50%  { transform: scale(1.1); }
-      100% { transform: scale(1); }
-    }
-
-    /* ════════════════════════════════════════════
-       NAV LINKS — sliding underline
-    ════════════════════════════════════════════ */
-    .nav-links a {
-      position: relative;
-    }
-    .nav-links a::after {
-      content: '';
-      position: absolute;
-      bottom: -3px; left: 0;
-      width: 0%; height: 1px;
-      background: var(--p);
-      transition: width 0.25s cubic-bezier(0.23,1,0.32,1);
-    }
-    .nav-links a:hover::after { width: 100%; }
-
-    /* ════════════════════════════════════════════
-       SCROLL-DRIVEN PARALLAX (progressive enhance)
-    ════════════════════════════════════════════ */
-    @supports (animation-timeline: scroll()) {
-      .hero-content {
-        animation: hero-parallax linear both;
-        animation-timeline: scroll(root);
-        animation-range: 0px 600px;
-      }
-      @keyframes hero-parallax {
-        from { transform: translateY(0);    opacity: 1; }
-        to   { transform: translateY(80px); opacity: 0.3; }
-      }
-    }
-
-    /* ════════════════════════════════════════════
-       ACCESSIBILITY — prefers-reduced-motion
-       (Emil principle: fewer & gentler, not zero —
-        keep opacity/color, remove movement)
-    ════════════════════════════════════════════ */
-    @media (prefers-reduced-motion: reduce) {
-      /* Remove transform-based motion only */
-      .reveal, .reveal-left, .reveal-right {
-        opacity: 1 !important;
-        transform: none !important;
-        transition: opacity 0.2s ease !important;
-      }
-      .hero-title, .hero-sub, .hero-eyebrow, .hero-actions, .hero-scroll,
-      header, .stat-item, .deal-card, .color-card, .app-card, .usp-card {
-        animation: none !important;
-        transform: none !important;
-      }
-      .about-orb, .logo-mark, .nav-logo-mark, .welcome-icon,
-      .scroll-arrow, .live-dot, .discount-bar::after, .goal-bar::after,
-      .spectrum-bar, .line-spectrum, .color-swatch-orb {
-        animation: none !important;
-      }
-      /* Disable hero parallax for reduced motion users */
-      .hero-content { animation: none !important; transform: none !important; }
-    }
-
-    /* ════════════════════════════════════════════
-       SCROLLBAR
-    ════════════════════════════════════════════ */
-    ::-webkit-scrollbar { width: 7px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: rgba(34,197,94,0.2); border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(34,197,94,0.35); }
-
-    /* ════════════════════════════════════════════
-       RESPONSIVE HELPERS
-    ════════════════════════════════════════════ */
     @media (max-width: 600px) {
-      .hero-title { font-size: 2.4rem; }
-      .color-grid { grid-template-columns: 1fr 1fr; }
-      .usp-grid { grid-template-columns: 1fr; }
+      .bento { grid-template-columns: 1fr; }
     }
 
-    /* ════════════════════════════════════════════
-       iOS HIG — Touch targets 44pt minimum
-       (Apple Human Interface Guidelines)
-    ════════════════════════════════════════════ */
-    @media (pointer: coarse) {
-      .nav-cta, .preset-btn, .page-btn, .view-btn,
-      .footer-links a, .nav-links a, .pill,
-      .btn-primary, .btn-ghost {
-        min-height: 44px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
+    .bt {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 22px; padding: 1.75rem;
+      transition: transform 0.3s var(--ease-out), box-shadow 0.3s;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .bt:hover { transform: translateY(-3px); box-shadow: 0 12px 32px oklch(0.14 0.018 145 / 0.09); }
+    }
+
+    .bento-feat {
+      grid-column: 1; grid-row: 1 / 3;
+      background: var(--fg); border-color: var(--fg);
+      padding: 2.5rem;
+      display: flex; flex-direction: column;
+    }
+    .bento-feat .bf-num {
+      font-family: var(--font-d); font-size: 4.5rem; font-weight: 900;
+      letter-spacing: -0.05em; line-height: 1;
+      color: oklch(0.88 0.09 145);
+      margin-bottom: 0.25rem; margin-top: auto;
+    }
+    .bento-feat .bf-num-label {
+      font-size: 0.78rem; font-weight: 500;
+      color: oklch(0.65 0.012 145); letter-spacing: 0.06em;
+      text-transform: uppercase; margin-bottom: 2rem;
+    }
+    .bento-feat h3 {
+      font-family: var(--font-d); font-size: 1.55rem; font-weight: 800;
+      letter-spacing: -0.02em; line-height: 1.2;
+      color: oklch(0.95 0.010 145); margin-bottom: 0.75rem;
+    }
+    .bento-feat p {
+      font-size: 0.88rem; color: oklch(0.68 0.012 145); line-height: 1.72; max-width: 40ch;
+    }
+
+    .bt h3 {
+      font-family: var(--font-d); font-size: 1.05rem; font-weight: 800;
+      letter-spacing: -0.015em; color: var(--fg); margin-bottom: 0.45rem; line-height: 1.25;
+    }
+    .bt p { font-size: 0.84rem; color: var(--fg2); line-height: 1.65; }
+    .bt-tag {
+      display: inline-block; font-size: 0.64rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--accent); background: var(--accent-lt);
+      border-radius: 6px; padding: 3px 8px; margin-bottom: 0.7rem;
+    }
+
+    .bt-stat {
+      text-align: center; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    .bt-stat .sn {
+      font-family: var(--font-d); font-size: 3rem; font-weight: 900;
+      letter-spacing: -0.04em; color: var(--accent); line-height: 1; margin-bottom: 0.3rem;
+    }
+    .bt-stat .sl { font-size: 0.8rem; color: var(--fg2); font-weight: 500; line-height: 1.4; }
+
+    /* ── ZIG-ZAG (Applications) ────────────────────────────── */
+    #applications { padding: var(--py) var(--px); background: var(--bg); }
+    .app-head { margin-bottom: 4rem; }
+    #applications h2 {
+      font-family: var(--font-d);
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      font-weight: 800; letter-spacing: -0.025em; color: var(--fg);
+    }
+
+    .zigzag { display: flex; flex-direction: column; gap: 3.5rem; max-width: 1100px; }
+
+    .zz {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: clamp(2rem, 4vw, 4rem); align-items: center;
+    }
+    @media (max-width: 720px) {
+      .zz { grid-template-columns: 1fr; gap: 1.5rem; }
+      .zz.rev .zv { order: -1; }
+    }
+    .zz.rev .zt { order: 2; }
+    .zz.rev .zv { order: 1; }
+
+    .zt .zz-cat { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.6rem; }
+    .zt h3 {
+      font-family: var(--font-d);
+      font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+      font-weight: 800; letter-spacing: -0.02em; line-height: 1.15;
+      color: var(--fg); margin-bottom: 1rem;
+    }
+    .zt p { font-size: 0.93rem; color: var(--fg2); line-height: 1.78; max-width: 48ch; margin-bottom: 1.25rem; }
+    .zz-tags { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+    .zz-tag {
+      font-size: 0.71rem; font-weight: 600; color: var(--fg2);
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 9999px; padding: 4px 12px;
+    }
+
+    .zv {
+      border-radius: 22px; overflow: hidden;
+      aspect-ratio: 4/3; position: relative;
+    }
+
+    .zv-drinks {
+      background: linear-gradient(155deg,
+        oklch(0.78 0.14 200) 0%, oklch(0.82 0.17 145) 40%,
+        oklch(0.75 0.14 88) 70%, oklch(0.70 0.18 25) 100%);
+    }
+    .zv-candy {
+      background: oklch(0.96 0.006 145);
+      position: relative; overflow: hidden;
+    }
+    .zv-candy::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(circle 70px at 15% 25%, oklch(0.65 0.22 25 / 0.85), transparent),
+        radial-gradient(circle 90px at 75% 65%, oklch(0.78 0.17 92 / 0.80), transparent),
+        radial-gradient(circle 60px at 50% 85%, oklch(0.56 0.20 145 / 0.75), transparent),
+        radial-gradient(circle 80px at 85% 15%, oklch(0.54 0.18 238 / 0.70), transparent),
+        radial-gradient(circle 55px at 30% 65%, oklch(0.51 0.18 292 / 0.65), transparent);
+    }
+    .zv-bakery {
+      background: linear-gradient(135deg,
+        oklch(0.90 0.09 80) 0%, oklch(0.84 0.13 65) 45%,
+        oklch(0.80 0.11 50) 100%);
+    }
+    .zv-dairy {
+      background: linear-gradient(120deg,
+        oklch(0.92 0.06 145) 0%, oklch(0.85 0.12 195) 50%,
+        oklch(0.90 0.08 88) 100%);
+    }
+
+    /* ── SUSTAINABILITY ────────────────────────────────────── */
+    #sustainability {
+      padding: var(--py) var(--px);
+      background: var(--fg); border-top: 1px solid var(--border);
+    }
+    .sustain-inner { max-width: 1100px; }
+    .sustain-quote {
+      font-family: var(--font-d);
+      font-size: clamp(1.6rem, 3.2vw, 2.8rem);
+      font-weight: 800; letter-spacing: -0.025em; line-height: 1.2;
+      color: oklch(0.94 0.010 145); max-width: 26ch; margin-bottom: 3.5rem;
+    }
+    .sustain-stats {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 2.5rem;
+      border-top: 1px solid oklch(0.25 0.014 145);
+      padding-top: 2.5rem;
+    }
+    @media (max-width: 640px) { .sustain-stats { grid-template-columns: 1fr; } }
+    .ss-num {
+      font-family: var(--font-d); font-size: 3.8rem; font-weight: 900;
+      letter-spacing: -0.04em; line-height: 1;
+      color: oklch(0.88 0.09 145); margin-bottom: 0.4rem;
+    }
+    .ss-label { font-size: 0.85rem; color: oklch(0.62 0.012 145); line-height: 1.55; max-width: 22ch; }
+
+    /* ── CTA ───────────────────────────────────────────────── */
+    #cta-section {
+      padding: var(--py) var(--px);
+      background: var(--accent); text-align: center;
+    }
+    .cta-inner { max-width: 620px; margin: 0 auto; }
+    .cta-eyebrow {
+      font-size: 0.67rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase;
+      color: oklch(0.97 0.010 145 / 0.65); display: block; margin-bottom: 1.25rem;
+    }
+    #cta-section h2 {
+      font-family: var(--font-d);
+      font-size: clamp(2rem, 4.5vw, 3.5rem);
+      font-weight: 900; letter-spacing: -0.03em; line-height: 1.1;
+      color: oklch(0.97 0.010 145); margin-bottom: 1rem;
+    }
+    #cta-section p {
+      font-size: 1rem; color: oklch(0.97 0.010 145 / 0.72); margin-bottom: 2.5rem; line-height: 1.65;
+    }
+    .cta-actions { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+    .cta-link {
+      font-size: 0.85rem; color: oklch(0.97 0.010 145 / 0.62); font-weight: 500;
+      text-decoration: underline; text-underline-offset: 3px; transition: color 0.18s;
+    }
+    @media (hover: hover) and (pointer: fine) { .cta-link:hover { color: oklch(0.97 0.010 145); } }
+
+    /* ── FOOTER ────────────────────────────────────────────── */
+    footer {
+      background: var(--fg); color: oklch(0.62 0.012 145);
+      padding: clamp(3.5rem, 6vw, 5rem) var(--px) max(2rem, env(safe-area-inset-bottom, 0px));
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 3rem; max-width: 1200px; margin-bottom: 3rem;
+    }
+    @media (max-width: 860px) { .footer-grid { grid-template-columns: 1fr 1fr; gap: 2rem; } }
+    @media (max-width: 480px) { .footer-grid { grid-template-columns: 1fr; } }
+    .footer-logo { margin-bottom: 1rem; }
+    .footer-logo img { height: 26px; width: auto; filter: brightness(0) invert(0.78); }
+    .footer-byline { font-size: 0.55rem; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.45 0.010 145); margin-top: 3px; }
+    .footer-tagline { font-size: 0.85rem; line-height: 1.65; margin-top: 1rem; max-width: 32ch; }
+    .fc-title { font-size: 0.67rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.95 0.010 145); margin-bottom: 1rem; }
+    .footer-links { display: flex; flex-direction: column; gap: 0.6rem; }
+    .footer-links a { font-size: 0.85rem; color: oklch(0.62 0.012 145); transition: color 0.18s; }
+    @media (hover: hover) and (pointer: fine) { .footer-links a:hover { color: oklch(0.90 0.010 145); } }
+    .footer-bottom {
+      border-top: 1px solid oklch(0.24 0.014 145);
+      padding-top: 1.5rem; display: flex;
+      justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 0.75rem; font-size: 0.78rem;
+    }
+    .footer-bottom a { color: oklch(0.55 0.011 145); transition: color 0.18s; }
+    @media (hover: hover) and (pointer: fine) { .footer-bottom a:hover { color: oklch(0.80 0.010 145); } }
+
+    /* ── RESPONSIVE ────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      #nav { height: calc(62px + env(safe-area-inset-top, 0px)); }
+      #hero { padding-top: calc(62px + env(safe-area-inset-top, 0px)); }
+      .hero-h1 { font-size: 2.5rem; }
+    }
+
+    /* ── REDUCED MOTION ────────────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      .reveal, .reveal-l, .reveal-r {
+        opacity: 1 !important; transform: none !important;
+        filter: none !important; transition: none !important;
       }
-      .preset-btn, .pill { padding: 10px 14px; }
-      .page-btn { padding: 12px 0; }
-      .view-btn { padding: 12px 0; }
-      /* Touch-friendly spacing inside cards */
-      .card-body { padding: 1.2rem; gap: 0.7rem; }
-      .footer-links { gap: 0.85rem; }
-    }
-
-    /* ════════════════════════════════════════════
-       iOS HIG — Smooth momentum scrolling
-    ════════════════════════════════════════════ */
-    html, body { -webkit-overflow-scrolling: touch; }
-
-    /* ════════════════════════════════════════════
-       iOS HIG — Press feedback (scales children too)
-    ════════════════════════════════════════════ */
-    a, button, [role="button"] {
-      -webkit-touch-callout: none;
-      -webkit-user-select: none;
-      user-select: none;
     }
   </style>
 </head>
 <body>
 
-<!-- Scroll progress -->
-<div id="scroll-progress"></div>
+<div id="sp"></div>
 
-<!-- ═══════════════════════════════════════════════════
-     NAVIGATION
-════════════════════════════════════════════════════ -->
+<!-- ═══ NAV ════════════════════════════════════════════════ -->
 <nav id="nav">
   <a class="nav-logo" href="#">
-    <img src="exberry-logo.svg" alt="EXBERRY®" class="nav-exberry-logo">
-    <span class="nav-logo-sub" style="display:block;margin-top:1px;font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted2);">by GNT Group</span>
+    <img src="exberry-logo.svg" alt="EXBERRY®">
+    <span class="nav-byline">by GNT Group</span>
   </a>
   <ul class="nav-links">
-    <li><a href="#about">Unternehmen</a></li>
-    <li><a href="#colors">EXBERRY®</a></li>
+    <li><a href="#colors">Farben</a></li>
+    <li><a href="#why">Vorteile</a></li>
     <li><a href="#applications">Anwendungen</a></li>
     <li><a href="#sustainability">Nachhaltigkeit</a></li>
-    <li><a href="#global">Global</a></li>
   </ul>
-  <a class="nav-cta" href="#cta-section">Kontakt aufnehmen</a>
+  <a class="nav-cta" href="#cta-section">Kontakt</a>
 </nav>
 
-<!-- ═══════════════════════════════════════════════════
-     HERO
-════════════════════════════════════════════════════ -->
+<!-- ═══ HERO ═══════════════════════════════════════════════ -->
 <section id="hero">
-  <canvas id="hero-canvas"></canvas>
-  <div class="hero-bg-glow"></div>
-
-  <div class="hero-content">
-    <div class="hero-eyebrow">
-      🌿 Seit 1978 · Pionier für pflanzliche Farben
-    </div>
-    <h1 class="hero-title">
-      <span class="line-green">Farben aus der Natur.</span><br>
-      <span style="color:var(--text)">Für die</span>
-      <span class="line-spectrum"> Welt von morgen.</span>
+  <div class="hero-left">
+    <div class="eyebrow reveal" style="transition-delay:0.05s">Pionier seit 1978 · Mierlo, Niederlande</div>
+    <h1 class="hero-h1 reveal" style="transition-delay:0.15s">
+      Die Kraft<br>der Natur.<br><span class="hl">In Farbe.</span>
     </h1>
-    <p class="hero-sub">
+    <p class="hero-sub reveal" style="transition-delay:0.28s">
       GNT Group ist der weltweit führende Hersteller pflanzlicher Lebensmittelfarben.
-      Mit EXBERRY® bringen wir die volle Kraft von Früchten, Gemüse und Pflanzen
-      in Speisen und Getränke — rein natürlich, nachhaltig und ohne künstliche Zusätze.
+      Mit EXBERRY® verwandeln wir Früchte, Gemüse und Pflanzen in über 400 Farblösungen —
+      rein natürlich, ohne Synthese.
     </p>
-    <div class="hero-actions">
-      <span class="magnetic-wrap">
-        <a href="#colors" class="btn-primary ripple-host" id="hero-cta">EXBERRY® entdecken</a>
-      </span>
-      <a href="#about" class="btn-ghost ripple-host">Unser Unternehmen</a>
+    <div class="hero-actions reveal" style="transition-delay:0.4s">
+      <a href="#colors" class="btn-primary" id="hero-cta">EXBERRY® entdecken</a>
+      <a href="#why" class="btn-ghost">Mehr erfahren</a>
     </div>
   </div>
-
-  <div class="hero-scroll">
-    <span>Scrollen</span>
-    <div class="scroll-arrow"></div>
+  <div class="hero-right">
+    <canvas id="hero-canvas"></canvas>
+    <span class="hero-canvas-label">Pflanzliche Farbstoffe · Echtzeit-Simulation</span>
   </div>
 </section>
 
-<!-- Spectrum divider -->
-<div class="spectrum-bar"></div>
+<!-- ═══ STATEMENT ══════════════════════════════════════════ -->
+<section id="statement">
+  <p class="statement-h reveal">400 Farben.<br>Alle aus<br>der Natur.</p>
+  <p class="statement-sub reveal" style="transition-delay:0.15s">
+    Kein Labor. Keine Synthese. Nur physikalische Prozesse — und die Kraft
+    von Früchten, Gemüse und Pflanzen aus aller Welt.
+  </p>
+</section>
 
-<!-- ═══════════════════════════════════════════════════
-     STATS
-════════════════════════════════════════════════════ -->
-<section id="stats">
-  <div class="stats-inner">
-    <div class="stat-item reveal">
-      <div class="stat-number" data-count="1978" data-suffix="">1978</div>
-      <div class="stat-label">Gegründet</div>
+<!-- ═══ EXBERRY COLORS ══════════════════════════════════════ -->
+<section id="colors">
+  <div class="colors-head">
+    <div>
+      <div class="sec-label reveal">EXBERRY® Farbspektrum</div>
+      <h2 class="reveal" style="transition-delay:0.1s">Das volle Spektrum<br>der Natur</h2>
     </div>
-    <div class="stat-item reveal" style="transition-delay:0.1s">
-      <div class="stat-number" data-count="400" data-suffix="+">0</div>
-      <div class="stat-label">Farbprodukte</div>
-    </div>
-    <div class="stat-item reveal" style="transition-delay:0.2s">
-      <div class="stat-number" data-count="2000" data-suffix="+">0</div>
-      <div class="stat-label">Unternehmenskunden</div>
-    </div>
-    <div class="stat-item reveal" style="transition-delay:0.3s">
-      <div class="stat-number" data-count="75" data-suffix="+">0</div>
-      <div class="stat-label">Märkte weltweit</div>
-    </div>
-    <div class="stat-item reveal" style="transition-delay:0.4s">
-      <div class="stat-number" data-count="100" data-suffix="%">0</div>
-      <div class="stat-label">Pflanzliche Rohstoffe</div>
+    <span class="colors-hint reveal" style="transition-delay:0.2s">Ziehen zum Scrollen</span>
+  </div>
+  <div class="colors-scroll" id="colScroll">
+    <div class="colors-strip">
+      <div class="cc">
+        <div class="cc-swatch" style="background:var(--s-red)"></div>
+        <div class="cc-body">
+          <div class="cc-name">Brilliant Red</div>
+          <div class="cc-src">Himbeeren &amp; Holunderbeeren</div>
+        </div>
+      </div>
+      <div class="cc">
+        <div class="cc-swatch" style="background:var(--s-orange)"></div>
+        <div class="cc-body">
+          <div class="cc-name">Sunset Orange</div>
+          <div class="cc-src">Karotten &amp; Paprika</div>
+        </div>
+      </div>
+      <div class="cc">
+        <div class="cc-swatch" style="background:var(--s-yellow)"></div>
+        <div class="cc-body">
+          <div class="cc-name">Golden Yellow</div>
+          <div class="cc-src">Curcuma &amp; Saflor</div>
+        </div>
+      </div>
+      <div class="cc">
+        <div class="cc-swatch" style="background:var(--s-lime)"></div>
+        <div class="cc-body">
+          <div class="cc-name">Fresh Lime</div>
+          <div class="cc-src">Spinat &amp; Brennnessel</div>
+        </div>
+      </div>
+      <div class="cc">
+        <div class="cc-swatch" style="background:var(--s-green)"></div>
+        <div class="cc-body">
+          <div class="cc-name">Natural Green</div>
+          <div class="cc-src">Spirulina &amp; Algen</div>
+        </div>
+      </div>
+      <div class="cc">
+        <div class="cc-swatch" style="background:var(--s-teal)"></div>
+        <div class="cc-body">
+          <div class="cc-name">Ocean Teal</div>
+          <div class="cc-src">Spirulina &amp; Blaubeeren</div>
+        </div>
+      </div>
+      <div class="cc">
+        <div class="cc-swatch" style="background:var(--s-blue)"></div>
+        <div class="cc-body">
+          <div class="cc-name">Cornflower Blue</div>
+          <div class="cc-src">Butterfly Pea Flower</div>
+        </div>
+      </div>
+      <div class="cc">
+        <div class="cc-swatch" style="background:var(--s-purple)"></div>
+        <div class="cc-body">
+          <div class="cc-name">Berry Purple</div>
+          <div class="cc-src">Rote Trauben &amp; Holunder</div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- Spectrum divider -->
-<div class="spectrum-bar"></div>
+<!-- ═══ WHY EXBERRY (BENTO) ════════════════════════════════ -->
+<section id="why">
+  <div class="why-head">
+    <div class="sec-label reveal">Warum EXBERRY®</div>
+    <h2 class="reveal" style="transition-delay:0.1s">Was uns<br>unterscheidet</h2>
+  </div>
+  <div class="bento reveal" style="transition-delay:0.15s">
 
-<!-- ═══════════════════════════════════════════════════
-     ABOUT
-════════════════════════════════════════════════════ -->
-<section id="about">
-  <div class="about-grid">
-
-    <div class="reveal-left">
-      <div class="section-label">Über uns</div>
-      <h2 class="section-title">
-        Familienunternehmen mit <span class="hl">globaler Wirkung</span>
-      </h2>
-      <p class="section-desc">
-        1978 in Aachen gegründet, hat sich die GNT Group zum weltweiten Marktführer
-        für pflanzliche Lebensmittelfarben entwickelt. Als unabhängiges Familienunternehmen
-        mit Hauptsitz in Mierlo, Niederlande, treffen wir Entscheidungen für die Zukunft —
-        nicht für das nächste Quartal.
-      </p>
-
-      <div class="timeline">
-        <div class="timeline-item">
-          <div class="timeline-dot">78</div>
-          <div class="timeline-body">
-            <div class="timeline-year">Gründung 1978</div>
-            <div class="timeline-text">Gründung in Aachen, Deutschland — mit der Vision, echte Naturfarben für die Lebensmittelindustrie zu entwickeln.</div>
-          </div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-dot">↗</div>
-          <div class="timeline-body">
-            <div class="timeline-year">Internationale Expansion</div>
-            <div class="timeline-text">Aufbau eines globalen Netzwerks mit Büros in Europa, Nordamerika, Asien und dem Nahen Osten.</div>
-          </div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-dot">EX</div>
-          <div class="timeline-body">
-            <div class="timeline-year">EXBERRY® — Weltmarktführer</div>
-            <div class="timeline-text">Mit über 400 Produkten und mehr als 2.000 Kunden weltweit ist EXBERRY® die globale Nr. 1 der Coloring Foods.</div>
-          </div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-dot">🧬</div>
-          <div class="timeline-body">
-            <div class="timeline-year">Innovation: Fermentation</div>
-            <div class="timeline-text">Entwicklung neuer Farblösungen durch Fermentationstechnologie — nachhaltiger, effizienter, zukunftssicher.</div>
-          </div>
-        </div>
-      </div>
+    <div class="bt bento-feat">
+      <div class="bf-num" data-count="400" data-suffix="+">400+</div>
+      <div class="bf-num-label">Farblösungen</div>
+      <h3>100% pflanzlich.<br>Kein Kompromiss.</h3>
+      <p>Jede einzelne EXBERRY® Farbe entsteht ausschließlich aus Früchten,
+         Gemüse und Pflanzen — durch rein physikalische Prozesse ohne organische
+         Lösungsmittel. Was aus der Natur kommt, bleibt natürlich.</p>
     </div>
 
-    <div class="reveal-right">
-      <div class="about-visual">
-        <div class="about-orb orb-main"></div>
-        <div class="about-orb orb-red"></div>
-        <div class="about-orb orb-orange"></div>
-        <div class="about-orb orb-blue"></div>
-        <div class="about-orb orb-purple"></div>
-        <div class="about-orb orb-yellow"></div>
-        <div class="about-logo-center">
-          <div class="about-logo-circle">
-            <span class="about-logo-text">GNT</span>
-          </div>
-        </div>
-      </div>
+    <div class="bt">
+      <div class="bt-tag">Clean Label</div>
+      <h3>Lebensmittelzutat, nicht Additiv</h3>
+      <p>In vielen Märkten weltweit gilt EXBERRY® als Zutat — nicht als
+         Farbstoff-Additiv. Ideal für verbraucherfreundliche Etiketten.</p>
+    </div>
+
+    <div class="bt">
+      <div class="bt-tag">Prozess</div>
+      <h3>Nur physikalische Verarbeitung</h3>
+      <p>Keine organischen Lösungsmittel. Konzentration durch schonende
+         physikalische Methoden — die Natur bleibt erhalten.</p>
+    </div>
+
+    <div class="bt bt-stat">
+      <div class="sn" data-count="2000" data-suffix="+">2.000+</div>
+      <div class="sl">Kunden in der Lebensmittel- &amp; Getränkeindustrie weltweit</div>
+    </div>
+
+    <div class="bt bt-stat">
+      <div class="sn" data-count="75" data-suffix="+">75+</div>
+      <div class="sl">Märkte auf 4 Kontinenten vertrauen EXBERRY®</div>
     </div>
 
   </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════════
-     EXBERRY COLORS
-════════════════════════════════════════════════════ -->
-<section id="colors" id="colors-section" style="background:var(--bg2);max-width:none;padding:0;">
-<div style="max-width:1300px;margin:0 auto;padding:clamp(4rem,8vw,7rem) clamp(1.5rem,5vw,5rem);">
-
-  <div class="colors-header">
-    <div class="reveal">
-      <div class="section-label">Produkte</div>
-      <h2 class="section-title">
-        Das <span class="hl">volle Spektrum</span> der Natur
-      </h2>
-      <p class="section-desc">
-        EXBERRY® bietet über 400 Farblösungen — von leuchtendem Rot bis tiefem Blau-Violett.
-        Alle Farben entstehen ausschließlich aus Früchten, Gemüse und Pflanzen.
-      </p>
-    </div>
-    <div class="reveal" style="transition-delay:0.2s">
-      <img src="exberry-logo.svg" alt="EXBERRY®" style="height:52px;width:auto;display:block;">
-    </div>
-  </div>
-
-  <div class="color-grid">
-    <div class="color-card reveal" style="transition-delay:0.05s">
-      <div class="color-swatch" style="background:#1a0808;">
-        <div class="color-swatch-orb" style="background:radial-gradient(circle, #ef4444, #b91c1c);"></div>
-      </div>
-      <div class="color-info"><div class="color-name">Kräftiges Rot</div><div class="color-source">Schwarze Karotte, Hibiskus</div></div>
-    </div>
-    <div class="color-card reveal" style="transition-delay:0.1s">
-      <div class="color-swatch" style="background:#1a0e06;">
-        <div class="color-swatch-orb" style="background:radial-gradient(circle, #f97316, #c2410c);"></div>
-      </div>
-      <div class="color-info"><div class="color-name">Leuchtendes Orange</div><div class="color-source">Kürbis, Karotte</div></div>
-    </div>
-    <div class="color-card reveal" style="transition-delay:0.15s">
-      <div class="color-swatch" style="background:#191300;">
-        <div class="color-swatch-orb" style="background:radial-gradient(circle, #eab308, #a16207);"></div>
-      </div>
-      <div class="color-info"><div class="color-name">Goldenes Gelb</div><div class="color-source">Safran, Kurkuma</div></div>
-    </div>
-    <div class="color-card reveal" style="transition-delay:0.2s">
-      <div class="color-swatch" style="background:#071509;">
-        <div class="color-swatch-orb" style="background:radial-gradient(circle, #22c55e, #15803d);"></div>
-      </div>
-      <div class="color-info"><div class="color-name">Frisches Grün</div><div class="color-source">Spinat, Spirulina</div></div>
-    </div>
-    <div class="color-card reveal" style="transition-delay:0.25s">
-      <div class="color-swatch" style="background:#03100e;">
-        <div class="color-swatch-orb" style="background:radial-gradient(circle, #14b8a6, #0f766e);"></div>
-      </div>
-      <div class="color-info"><div class="color-name">Türkis-Blau</div><div class="color-source">Spirulina, Algen</div></div>
-    </div>
-    <div class="color-card reveal" style="transition-delay:0.3s">
-      <div class="color-swatch" style="background:#030b18;">
-        <div class="color-swatch-orb" style="background:radial-gradient(circle, #3b82f6, #1d4ed8);"></div>
-      </div>
-      <div class="color-info"><div class="color-name">Tiefes Blau</div><div class="color-source">Blaubeere, Rotkohl</div></div>
-    </div>
-    <div class="color-card reveal" style="transition-delay:0.35s">
-      <div class="color-swatch" style="background:#0d0818;">
-        <div class="color-swatch-orb" style="background:radial-gradient(circle, #8b5cf6, #6d28d9);"></div>
-      </div>
-      <div class="color-info"><div class="color-name">Violett-Lila</div><div class="color-source">Schwarze Johannisbeere</div></div>
-    </div>
-    <div class="color-card reveal" style="transition-delay:0.4s">
-      <div class="color-swatch" style="background:#180612;">
-        <div class="color-swatch-orb" style="background:radial-gradient(circle, #ec4899, #be185d);"></div>
-      </div>
-      <div class="color-info"><div class="color-name">Lebhaftes Pink</div><div class="color-source">Rote Beete, Erdbeere</div></div>
-    </div>
-  </div>
-
-</div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════
-     APPLICATIONS
-════════════════════════════════════════════════════ -->
+<!-- ═══ APPLICATIONS (ZIG-ZAG) ════════════════════════════ -->
 <section id="applications">
-  <div class="reveal">
-    <div class="section-label">Anwendungen</div>
-    <h2 class="section-title">
-      Überall dort, wo <span class="hl">Farbe zählt</span>
-    </h2>
-    <p class="section-desc">
-      EXBERRY® Farben eignen sich für nahezu alle Lebensmittel- und Getränkeanwendungen —
-      von erfrischenden Getränken bis hin zu pflanzlichem Fleischersatz.
-    </p>
+  <div class="app-head">
+    <div class="sec-label reveal">Anwendungen</div>
+    <h2 class="reveal" style="transition-delay:0.1s">Für jede Kategorie</h2>
   </div>
+  <div class="zigzag">
 
-  <div class="app-grid">
-    <div class="app-card reveal" style="--card-color:rgba(59,130,246,0.4);transition-delay:.05s">
-      <span class="app-icon">🥤</span>
-      <div class="app-name">Getränke</div>
-      <div class="app-desc">Softdrinks, Fruchtsäfte, Sportgetränke, alkoholische Getränke und Tees in brillanten Farbtönen.</div>
+    <div class="zz reveal">
+      <div class="zt">
+        <div class="zz-cat">Getränke</div>
+        <h3>Von isotonisch bis Premium-Juice</h3>
+        <p>EXBERRY® Farben sind hitzestabil, lichtecht und kompatibel mit
+           einer Vielzahl von Formulierungen — von klaren Erfrischungsgetränken
+           bis zu trüben Fruchtsäften.</p>
+        <div class="zz-tags">
+          <span class="zz-tag">Softdrinks</span>
+          <span class="zz-tag">Fruchtsäfte</span>
+          <span class="zz-tag">Sportgetränke</span>
+          <span class="zz-tag">Alkohol</span>
+        </div>
+      </div>
+      <div class="zv zv-drinks"></div>
     </div>
-    <div class="app-card reveal" style="--card-color:rgba(249,115,22,0.4);transition-delay:.1s">
-      <span class="app-icon">🍬</span>
-      <div class="app-name">Süßwaren</div>
-      <div class="app-desc">Bonbons, Gummibärchen, Schokolade und Zuckerwaren in leuchtenden, stabilen Naturfarben.</div>
+
+    <div class="zz rev reveal" style="transition-delay:0.1s">
+      <div class="zt">
+        <div class="zz-cat">Konfekt &amp; Süßwaren</div>
+        <h3>Lebendige Farben für Gummibärchen &amp; Macarons</h3>
+        <p>Von leuchtend Rot bis tiefem Blau-Violett: EXBERRY® liefert stabile,
+           brillante Farben für Hartkaramellen, Gummis, Schokolade und
+           Zuckerwaren aller Art.</p>
+        <div class="zz-tags">
+          <span class="zz-tag">Gummibärchen</span>
+          <span class="zz-tag">Bonbons</span>
+          <span class="zz-tag">Macarons</span>
+          <span class="zz-tag">Dragees</span>
+        </div>
+      </div>
+      <div class="zv zv-candy"></div>
     </div>
-    <div class="app-card reveal" style="--card-color:rgba(234,179,8,0.4);transition-delay:.15s">
-      <span class="app-icon">🥐</span>
-      <div class="app-name">Backwaren</div>
-      <div class="app-desc">Kuchen, Kekse und Gebäck mit natürlichen Pastelltönen und kräftigen Farben.</div>
+
+    <div class="zz reveal" style="transition-delay:0.1s">
+      <div class="zt">
+        <div class="zz-cat">Backwaren &amp; Molkerei</div>
+        <h3>Cremes, Glazuren und Joghurt</h3>
+        <p>Ob warme Backprozesse oder gekühlte Molkereiprodukte: EXBERRY®
+           Farben behalten ihre Brillanz unter verschiedensten
+           Verarbeitungsbedingungen.</p>
+        <div class="zz-tags">
+          <span class="zz-tag">Joghurt</span>
+          <span class="zz-tag">Glazuren</span>
+          <span class="zz-tag">Cremes</span>
+          <span class="zz-tag">Frischkäse</span>
+        </div>
+      </div>
+      <div class="zv zv-bakery"></div>
     </div>
-    <div class="app-card reveal" style="--card-color:rgba(255,255,255,0.15);transition-delay:.2s">
-      <span class="app-icon">🥛</span>
-      <div class="app-name">Molkereiprodukte</div>
-      <div class="app-desc">Joghurt, Eiscreme, Käse und Desserts mit ansprechenden Naturfarben.</div>
-    </div>
-    <div class="app-card reveal" style="--card-color:rgba(132,204,22,0.4);transition-delay:.25s">
-      <span class="app-icon">🥗</span>
-      <div class="app-name">Snacks & Herzhaftes</div>
-      <div class="app-desc">Chips, Nüsse, Würzmittel und herzhafte Snacks mit natürlicher Farbe.</div>
-    </div>
-    <div class="app-card reveal" style="--card-color:rgba(239,68,68,0.4);transition-delay:.3s">
-      <span class="app-icon">🍔</span>
-      <div class="app-name">Plant-Based Fleisch</div>
-      <div class="app-desc">Pflanzliche Fleischalternativen mit realistischem Erscheinungsbild dank natürlicher Farbgebung.</div>
-    </div>
-    <div class="app-card reveal" style="--card-color:rgba(139,92,246,0.4);transition-delay:.35s">
-      <span class="app-icon">🐾</span>
-      <div class="app-name">Tiernahrung</div>
-      <div class="app-desc">Heimtiernahrung mit attraktivem Erscheinungsbild und natürlichen Zutaten.</div>
-    </div>
-    <div class="app-card reveal" style="--card-color:rgba(20,184,166,0.4);transition-delay:.4s">
-      <span class="app-icon">💊</span>
-      <div class="app-name">Nahrungsergänzung</div>
-      <div class="app-desc">Vitamine, Kapseln und Supplements mit pflanzlichen Farblösungen.</div>
-    </div>
+
   </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════════
-     WHY EXBERRY
-════════════════════════════════════════════════════ -->
-<section id="why-section" style="background:linear-gradient(180deg,var(--bg2) 0%,var(--bg) 100%);max-width:none;padding:0;">
-<div style="max-width:1300px;margin:0 auto;padding:clamp(4rem,8vw,7rem) clamp(1.5rem,5vw,5rem);">
-
-  <div class="reveal" style="text-align:center;max-width:600px;margin:0 auto 0.5rem;">
-    <div class="section-label" style="justify-content:center;">Warum EXBERRY®</div>
-    <h2 class="section-title" style="text-align:center;">
-      Der Unterschied, der <span class="hl">zählt</span>
-    </h2>
-    <p class="section-desc" style="margin:0 auto;">
-      EXBERRY® ist mehr als eine Farbe — es ist ein Versprechen an Verbraucher,
-      Hersteller und den Planeten.
-    </p>
-  </div>
-
-  <div class="usp-grid">
-    <div class="usp-card reveal" style="transition-delay:.05s">
-      <div class="usp-icon-wrap">🌿</div>
-      <div class="usp-title">100% Pflanzlich</div>
-      <div class="usp-text">Alle Farben stammen aus Früchten, Gemüse und Pflanzen. Keine künstlichen Farbstoffe, keine chemischen Lösungsmittel, keine Gentechnik.</div>
-    </div>
-    <div class="usp-card reveal" style="transition-delay:.1s">
-      <div class="usp-icon-wrap">🏷️</div>
-      <div class="usp-title">Clean Label</div>
-      <div class="usp-text">EXBERRY® Farben gelten in vielen Ländern als Lebensmittelzutat — nicht als Zusatzstoff. Ideal für verbraucherfreundliche Etiketten.</div>
-    </div>
-    <div class="usp-card reveal" style="transition-delay:.15s">
-      <div class="usp-icon-wrap">🔬</div>
-      <div class="usp-title">Physikalische Verarbeitung</div>
-      <div class="usp-text">Nur schonende Methoden: Pressen, Zerkleinern, Filtern. Keinerlei organische Lösungsmittel oder chemische Extraktion.</div>
-    </div>
-    <div class="usp-card reveal" style="transition-delay:.2s">
-      <div class="usp-icon-wrap">🎨</div>
-      <div class="usp-title">400+ Farbtöne</div>
-      <div class="usp-text">Das breiteste Portfolio an Naturfarben weltweit — von zartem Pastell bis zu leuchtenden Farbtönen über das gesamte Farbspektrum.</div>
-    </div>
-    <div class="usp-card reveal" style="transition-delay:.25s">
-      <div class="usp-icon-wrap">🌍</div>
-      <div class="usp-title">Global verfügbar</div>
-      <div class="usp-text">Lieferung in über 75 Märkte. Lokale Expertise mit globaler Reichweite — Büros auf 4 Kontinenten.</div>
-    </div>
-    <div class="usp-card reveal" style="transition-delay:.3s">
-      <div class="usp-icon-wrap">🤝</div>
-      <div class="usp-title">Verlässlicher Partner</div>
-      <div class="usp-text">Als Familienunternehmen seit 1978 denken wir in Generationen. Langfristige Partnerschaften statt kurzfristiger Gewinne.</div>
-    </div>
-  </div>
-
-</div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════
-     SUSTAINABILITY
-════════════════════════════════════════════════════ -->
+<!-- ═══ SUSTAINABILITY ══════════════════════════════════════ -->
 <section id="sustainability">
-  <div class="reveal">
-    <div class="section-label">Nachhaltigkeit</div>
-    <h2 class="section-title">
-      Unsere Ziele <span class="hl">für 2030</span>
-    </h2>
-    <p class="section-desc">
-      Nachhaltigkeit ist kein Marketing — es ist unser Kernauftrag.
-      Wir haben uns ambitionierte Ziele gesetzt und arbeiten täglich daran.
+  <div class="sustain-inner">
+    <p class="sustain-quote reveal">
+      "Verantwortung ist kein Trend. Es ist unser Kerngeschäft — seit 1978."
     </p>
-  </div>
-
-  <div class="sustain-grid">
-    <div class="sustain-goals reveal">
-      <div class="goal-item">
-        <div class="goal-header">
-          <span class="goal-name">🌱 Reduktion CO₂-Emissionen</span>
-          <span class="goal-target">−50% bis 2030</span>
-        </div>
-        <div class="goal-bar-track"><div class="goal-bar" data-width="68"></div></div>
-        <div class="goal-note">Aktueller Fortschritt: 68% des Ziels erreicht</div>
+    <div class="sustain-stats">
+      <div class="reveal">
+        <div class="ss-num" data-count="73" data-suffix="%">73%</div>
+        <div class="ss-label">CO2-Reduktionsziel bis 2030 gegenuber Baseline 2019</div>
       </div>
-      <div class="goal-item">
-        <div class="goal-header">
-          <span class="goal-name">💧 Wasserverbrauch senken</span>
-          <span class="goal-target">−30% bis 2030</span>
-        </div>
-        <div class="goal-bar-track"><div class="goal-bar" data-width="55"></div></div>
-        <div class="goal-note">Aktueller Fortschritt: 55% des Ziels erreicht</div>
+      <div class="reveal" style="transition-delay:0.12s">
+        <div class="ss-num">100%</div>
+        <div class="ss-label">Erneuerbare Energie in der Produktion bis 2028</div>
       </div>
-      <div class="goal-item">
-        <div class="goal-header">
-          <span class="goal-name">♻️ Kreislaufwirtschaft</span>
-          <span class="goal-target">Zero Waste bis 2030</span>
-        </div>
-        <div class="goal-bar-track"><div class="goal-bar" data-width="42"></div></div>
-        <div class="goal-note">Aktueller Fortschritt: 42% des Ziels erreicht</div>
-      </div>
-      <div class="goal-item">
-        <div class="goal-header">
-          <span class="goal-name">🌳 Nachhaltige Lieferkette</span>
-          <span class="goal-target">100% zertifiziert bis 2030</span>
-        </div>
-        <div class="goal-bar-track"><div class="goal-bar" data-width="78"></div></div>
-        <div class="goal-note">Aktueller Fortschritt: 78% des Ziels erreicht</div>
-      </div>
-    </div>
-
-    <div class="sustain-facts reveal" style="transition-delay:0.2s">
-      <div class="sfact">
-        <span class="sfact-icon">☀️</span>
-        <div class="sfact-val">100%</div>
-        <div class="sfact-label">Erneuerbare Energie in der Produktion</div>
-      </div>
-      <div class="sfact">
-        <span class="sfact-icon">🌾</span>
-        <div class="sfact-val">Non-GMO</div>
-        <div class="sfact-label">Alle Rohstoffe ohne Gentechnik</div>
-      </div>
-      <div class="sfact">
-        <span class="sfact-icon">🚫</span>
-        <div class="sfact-val">0</div>
-        <div class="sfact-label">Organische Lösungsmittel im Prozess</div>
-      </div>
-      <div class="sfact">
-        <span class="sfact-icon">🤲</span>
-        <div class="sfact-val">Fair</div>
-        <div class="sfact-label">Faire Handelsbedingungen mit Lieferanten</div>
+      <div class="reveal" style="transition-delay:0.24s">
+        <div class="ss-num" data-count="47" data-suffix="%">47%</div>
+        <div class="ss-label">Weniger Wasserverbrauch pro kg Produkt seit 2019</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Spectrum divider -->
-<div class="spectrum-bar"></div>
-
-<!-- ═══════════════════════════════════════════════════
-     INNOVATION
-════════════════════════════════════════════════════ -->
-<section id="innovation" style="background:var(--bg2);max-width:none;padding:0;">
-<div style="max-width:1300px;margin:0 auto;padding:clamp(4rem,8vw,7rem) clamp(1.5rem,5vw,5rem);">
-
-  <div class="reveal">
-    <div class="section-label">Innovation</div>
-    <h2 class="section-title">
-      Die Zukunft der <span class="hl">Naturfarben</span>
-    </h2>
-    <p class="section-desc">
-      Wir investieren kontinuierlich in Forschung und Entwicklung, um die
-      nächste Generation pflanzlicher Farblösungen zu erschaffen.
+<!-- ═══ CTA ═════════════════════════════════════════════════ -->
+<section id="cta-section">
+  <div class="cta-inner">
+    <span class="cta-eyebrow reveal">Jetzt starten</span>
+    <h2 class="reveal" style="transition-delay:0.1s">Bereit fur naturliche Farben?</h2>
+    <p class="reveal" style="transition-delay:0.2s">
+      Uber 2.000 Unternehmen in 75+ Markten vertrauen auf EXBERRY®.
+      Sprechen Sie mit unserem Team.
     </p>
-  </div>
-
-  <div class="innov-grid">
-    <div class="innov-main reveal">
-      <div class="innov-main-bg"></div>
-      <div style="position:relative;z-index:1;">
-        <div class="innov-tag">🧬 Neueste Technologie</div>
-        <h3>Fermentation — die nächste Revolution</h3>
-        <p>
-          GNT entwickelt neue EXBERRY® Farblösungen durch innovative Fermentationstechnologie.
-          Dieser Durchbruch erweitert unser Farbspektrum erheblich und erhöht gleichzeitig
-          die Nachhaltigkeit unserer Produktion. Bestimmte Farbtöne, die aus traditionellen
-          Pflanzen schwer zu gewinnen sind, werden durch präzise Fermentation ermöglicht —
-          ohne Kompromisse bei Natürlichkeit oder Clean-Label-Standards.
-        </p>
-        <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:1.5rem;">
-          <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:8px;padding:0.5rem 1rem;font-size:0.78rem;color:var(--p);">
-            ✓ Größeres Farbspektrum
-          </div>
-          <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:8px;padding:0.5rem 1rem;font-size:0.78rem;color:var(--p);">
-            ✓ Höhere Stabilität
-          </div>
-          <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:8px;padding:0.5rem 1rem;font-size:0.78rem;color:var(--p);">
-            ✓ Geringerer Ressourcenverbrauch
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="innov-side">
-      <div class="innov-card reveal" style="transition-delay:0.15s">
-        <div style="font-size:1.8rem;margin-bottom:0.8rem;">🌈</div>
-        <h4>Erweiterte Farbpalette</h4>
-        <p>Kontinuierliche Entwicklung neuer Farbtöne — besonders im schwierigen blauen und violetten Spektrum aus rein pflanzlichen Quellen.</p>
-      </div>
-      <div class="innov-card reveal" style="transition-delay:0.25s">
-        <div style="font-size:1.8rem;margin-bottom:0.8rem;">⚗️</div>
-        <h4>Anwendungsforschung</h4>
-        <p>Unser globales F&E-Team entwickelt maßgeschneiderte Farblösungen für spezifische Produktanforderungen unserer Kunden.</p>
-      </div>
-    </div>
-  </div>
-
-</div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════
-     GLOBAL PRESENCE
-════════════════════════════════════════════════════ -->
-<section id="global">
-  <div class="reveal" style="text-align:center;max-width:600px;margin:0 auto;">
-    <div class="section-label" style="justify-content:center;">Globale Präsenz</div>
-    <h2 class="section-title" style="text-align:center;">
-      Lokal verwurzelt, <span class="hl">global vernetzt</span>
-    </h2>
-    <p class="section-desc" style="margin:0 auto;">
-      Mit Büros und Partnern auf 4 Kontinenten sind wir immer nah an unseren Kunden
-      und Lieferanten.
-    </p>
-  </div>
-
-  <div class="global-grid">
-    <div class="region-card reveal" style="transition-delay:.05s">
-      <span class="region-flag">🇳🇱</span>
-      <div class="region-name">Hauptsitz Europa</div>
-      <div class="region-cities">Mierlo, Niederlande<br>Kernmarkt · F&E · Produktion</div>
-    </div>
-    <div class="region-card reveal" style="transition-delay:.1s">
-      <span class="region-flag">🇩🇪</span>
-      <div class="region-name">Deutschland</div>
-      <div class="region-cities">Gründungsstandort Aachen<br>Europäisches Vertriebszentrum</div>
-    </div>
-    <div class="region-card reveal" style="transition-delay:.15s">
-      <span class="region-flag">🇺🇸</span>
-      <div class="region-name">Nordamerika</div>
-      <div class="region-cities">USA & Kanada<br>Starkes Wachstumsgebiet</div>
-    </div>
-    <div class="region-card reveal" style="transition-delay:.2s">
-      <span class="region-flag">🌏</span>
-      <div class="region-name">Asien-Pazifik</div>
-      <div class="region-cities">China, Japan, Australien<br>Expansionsmarkt mit eigenem Büro</div>
-    </div>
-    <div class="region-card reveal" style="transition-delay:.25s">
-      <span class="region-flag">🌍</span>
-      <div class="region-name">Naher Osten & Afrika</div>
-      <div class="region-cities">UAE, Saudi-Arabien<br>Wachsender Premiummarkt</div>
-    </div>
-    <div class="region-card reveal" style="transition-delay:.3s">
-      <span class="region-flag">🌎</span>
-      <div class="region-name">Lateinamerika</div>
-      <div class="region-cities">Brasilien, Mexiko<br>Emerging Markets</div>
+    <div class="cta-actions reveal" style="transition-delay:0.3s">
+      <a href="mailto:info@gnt-group.com" class="btn-white">Kontakt aufnehmen</a>
+      <a href="#colors" class="cta-link">Muster anfordern &rarr;</a>
     </div>
   </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════════
-     MISSION BANNER
-════════════════════════════════════════════════════ -->
-<section id="mission-banner" style="background:linear-gradient(135deg,#0a1f0e 0%,#0d1a10 50%,#091808 100%);border-top:1px solid rgba(34,197,94,0.15);border-bottom:1px solid rgba(34,197,94,0.15);max-width:none;padding:0;">
-<div style="max-width:1300px;margin:0 auto;padding:clamp(3rem,6vw,5rem) clamp(1.5rem,5vw,5rem);text-align:center;">
-  <div class="reveal">
-    <p class="mission-quote">
-      „Wir glauben, dass <span class="hl-green">natürliche Farben</span> die Zukunft der
-      Lebensmittelbranche sind — und dass es unsere Aufgabe ist, diese Zukunft
-      <span class="hl-green">möglich zu machen</span>."
-    </p>
-    <p class="mission-author">— GNT Group Unternehmensphilosophie · Seit 1978</p>
-  </div>
-</div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════
-     CTA
-════════════════════════════════════════════════════ -->
-<section id="cta-section" style="max-width:none;padding:0;background:radial-gradient(ellipse 80% 60% at 50% 50%,rgba(34,197,94,0.07),transparent 70%);">
-<div style="max-width:1300px;margin:0 auto;padding:clamp(5rem,10vw,8rem) clamp(1.5rem,5vw,5rem);text-align:center;">
-  <div class="reveal">
-    <h2 class="cta-title">
-      Bereit für natürliche<br><span style="background:linear-gradient(135deg,var(--p2),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Farblösungen?</span>
-    </h2>
-    <p class="cta-sub">
-      Sprechen Sie mit unseren Experten. Wir finden die perfekte EXBERRY®
-      Lösung für Ihr Produkt.
-    </p>
-    <div class="cta-actions">
-      <a class="btn-primary" href="mailto:info@gnt-group.com">Jetzt Kontakt aufnehmen</a>
-      <a class="btn-ghost" href="https://exberry.com" target="_blank" rel="noopener">EXBERRY® Website →</a>
-    </div>
-    <p style="margin-top:1.5rem;font-size:0.8rem;color:var(--muted);">
-      GNT Group B.V. · Mierlo, Niederlande · info@gnt-group.com
-    </p>
-  </div>
-</div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════
-     FOOTER
-════════════════════════════════════════════════════ -->
+<!-- ═══ FOOTER ═══════════════════════════════════════════════ -->
 <footer>
-  <div class="footer-inner">
-    <div class="footer-top">
-      <div class="footer-brand">
-        <div style="margin-bottom:0.8rem;">
-          <img src="exberry-logo.svg" alt="EXBERRY®" style="height:36px;width:auto;display:block;">
-          <span style="display:block;margin-top:4px;font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted2);">by GNT Group</span>
-        </div>
-        <p class="footer-tagline">
-          Pionier für pflanzliche Lebensmittelfarben seit 1978.
-          Wir machen die Welt bunter — auf natürliche Weise.
-        </p>
-      </div>
-      <div>
-        <p class="footer-col-title">Produkte</p>
-        <ul class="footer-links">
-          <li><a href="#">EXBERRY® Farben</a></li>
-          <li><a href="#">Coloring Foods</a></li>
-          <li><a href="#">Farbspektrum</a></li>
-          <li><a href="#">Anwendungen</a></li>
-        </ul>
-      </div>
-      <div>
-        <p class="footer-col-title">Unternehmen</p>
-        <ul class="footer-links">
-          <li><a href="#">Über GNT</a></li>
-          <li><a href="#">Nachhaltigkeit</a></li>
-          <li><a href="#">Innovation</a></li>
-          <li><a href="#">Karriere</a></li>
-        </ul>
-      </div>
-      <div>
-        <p class="footer-col-title">Kontakt</p>
-        <ul class="footer-links">
-          <li><a href="#">Mierlo, Niederlande</a></li>
-          <li><a href="#">info@gnt-group.com</a></li>
-          <li><a href="#">Pressekontakt</a></li>
-          <li><a href="#">Impressum</a></li>
-        </ul>
-      </div>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-logo"><img src="exberry-logo.svg" alt="EXBERRY®"></div>
+      <div class="footer-byline">by GNT Group</div>
+      <p class="footer-tagline">Pflanzliche Lebensmittelfarben fur eine nachhaltige Zukunft. Seit 1978 der Pionier der Branche.</p>
     </div>
-    <div class="footer-bottom">
-      <span>© 2025 GNT Group B.V. · Alle Rechte vorbehalten</span>
-      <span style="color:var(--muted2);">
-        <span class="nav-logo-name">GNT Group</span> · Natural Color Pioneer Since 1978
-      </span>
+    <div>
+      <div class="fc-title">Produkte</div>
+      <ul class="footer-links">
+        <li><a href="#colors">EXBERRY® Farben</a></li>
+        <li><a href="#applications">Anwendungen</a></li>
+        <li><a href="#why">Technologie</a></li>
+      </ul>
     </div>
+    <div>
+      <div class="fc-title">Unternehmen</div>
+      <ul class="footer-links">
+        <li><a href="#">Uber GNT Group</a></li>
+        <li><a href="#sustainability">Nachhaltigkeit</a></li>
+        <li><a href="#">Karriere</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="fc-title">Kontakt</div>
+      <ul class="footer-links">
+        <li><a href="mailto:info@gnt-group.com">info@gnt-group.com</a></li>
+        <li><a href="#">Niederlande (HQ)</a></li>
+        <li><a href="#">Weltweit</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2025 GNT Group B.V. Alle Rechte vorbehalten.</span>
+    <span><a href="#">Impressum</a> &nbsp;&middot;&nbsp; <a href="#">Datenschutz</a></span>
   </div>
 </footer>
 
-<!-- ═══════════════════════════════════════════════════
-     JAVASCRIPT
-════════════════════════════════════════════════════ -->
 <script>
-/* ── Nav scroll effect ── */
+/* ── Nav scroll ── */
 const nav = document.getElementById('nav');
 window.addEventListener('scroll', () => {
-  nav.classList.toggle('scrolled', window.scrollY > 30);
+  nav.classList.toggle('scrolled', window.scrollY > 40);
 }, { passive: true });
 
-/* ── Hero Canvas: WebGL Domain-Warped Fluid Dye ── */
+/* ── Scroll progress ── */
+const sp = document.getElementById('sp');
+window.addEventListener('scroll', () => {
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  sp.style.width = Math.min((window.scrollY / h) * 100, 100) + '%';
+}, { passive: true });
+
+/* ── Hero Canvas: WebGL Fluid (light bg / multiply blend) ── */
 (function() {
   const canvas = document.getElementById('hero-canvas');
   const noMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const VS = 'attribute vec2 a_pos;void main(){gl_Position=vec4(a_pos,0.,1.);}';
-
   const FS = [
     'precision highp float;',
     'uniform vec2 u_res;uniform float u_time;uniform vec2 u_mouse;uniform float u_scroll;',
     'float hash(vec2 p){p=fract(p*vec2(443.897,441.423));p+=dot(p,p+19.19);return fract(p.x*p.y);}',
-    'float noise(vec2 p){',
-    '  vec2 i=floor(p),f=fract(p),u=f*f*f*(f*(f*6.-15.)+10.);',
+    'float noise(vec2 p){vec2 i=floor(p),f=fract(p),u=f*f*f*(f*(f*6.-15.)+10.);',
     '  return mix(mix(hash(i),hash(i+vec2(1,0)),u.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),u.x),u.y);}',
     'float fbm(vec2 p){float v=0.,a=.5;mat2 m=mat2(.8,.6,-.6,.8);',
     '  for(int i=0;i<4;i++){v+=a*noise(p);p=m*p*2.1+vec2(100.);a*=.5;}return v;}',
@@ -1819,22 +884,22 @@ window.addEventListener('scroll', () => {
     '  vec3 r=clamp(abs(mod(h*6.+vec3(0.,4.,2.),6.)-3.)-1.,0.,1.);',
     '  return l+s*(r-.5)*(1.-abs(2.*l-1.));}',
     'void main(){',
-    '  vec2 uv=gl_FragCoord.xy/u_res;float t=u_time*.18;',
+    '  vec2 uv=gl_FragCoord.xy/u_res;float t=u_time*.15;',
     '  vec2 md=uv-u_mouse;float ml=length(md);',
-    '  vec2 mw=md/(ml*ml+.06)*.035;',
-    '  vec2 q=vec2(fbm(uv*2.8+t*.30),fbm(uv*2.8+vec2(5.2,1.3)+t*.27));',
-    '  vec2 r=vec2(fbm(uv*2.+q*1.6+vec2(1.7,9.2)+t*.22+mw),',
-    '              fbm(uv*2.+q*1.6+vec2(8.3,2.8)+t*.20+mw));',
+    '  vec2 mw=md/(ml*ml+.06)*.03;',
+    '  vec2 q=vec2(fbm(uv*2.8+t*.28),fbm(uv*2.8+vec2(5.2,1.3)+t*.25));',
+    '  vec2 r=vec2(fbm(uv*2.+q*1.6+vec2(1.7,9.2)+t*.20+mw),',
+    '              fbm(uv*2.+q*1.6+vec2(8.3,2.8)+t*.18+mw));',
     '  float f=fbm(uv*1.5+r*1.8);',
-    '  float hue=mod(f*1.05+.30+t*.035+u_scroll*.10,1.);',
-    '  float density=smoothstep(.28,.72,f);',
-    '  float lum=density*.42;',
-    '  vec3 col=hsl2rgb(hue,.90,lum);',
-    '  col*=1.-smoothstep(.35,.95,length(uv*2.-1.));',
+    '  float hue=mod(f*1.05+.28+t*.03+u_scroll*.08,1.);',
+    '  float density=smoothstep(.30,.70,f);',
+    /* light-bg: output light colors so multiply yields pastel wash */
+    '  float lum=1.0-density*.32;',
+    '  vec3 col=hsl2rgb(hue,.85,lum);',
+    '  col*=1.-smoothstep(.3,.9,length(uv*2.-1.));',
     '  gl_FragColor=vec4(col,1.);}'
   ].join('\n');
 
-  /* ── Try WebGL ── */
   let gl = null;
   if (!noMotion) {
     try {
@@ -1844,46 +909,32 @@ window.addEventListener('scroll', () => {
   }
 
   if (!gl) {
-    /* ── 2D particle fallback ── */
+    /* 2D fallback — coloured blobs */
     if (noMotion) return;
     const ctx = canvas.getContext('2d');
-    const COLORS = [
-      [239,68,68],[249,115,22],[234,179,8],[132,204,22],
-      [34,197,94],[20,184,166],[59,130,246],[139,92,246],[236,72,153]
-    ];
-    let W, H, parts;
-    const resize2d = () => {
-      W = canvas.width  = canvas.parentElement.offsetWidth;
-      H = canvas.height = canvas.parentElement.offsetHeight;
-    };
-    resize2d();
-    parts = Array.from({ length: 120 }, () => {
-      const c = COLORS[Math.floor(Math.random() * COLORS.length)];
-      return { x: Math.random()*W, y: Math.random()*H,
-               vx: (Math.random()-.5)*.3, vy: (Math.random()-.5)*.3,
-               r: Math.random()*2.5+.5, a: Math.random()*.5+.1, c };
-    });
-    window.addEventListener('resize', resize2d, { passive: true });
+    const COLS = ['oklch(0.55 0.22 25)','oklch(0.64 0.20 52)','oklch(0.78 0.17 92)',
+                  'oklch(0.71 0.19 128)','oklch(0.56 0.20 145)','oklch(0.58 0.16 186)',
+                  'oklch(0.54 0.18 238)','oklch(0.51 0.18 292)'];
+    let W, H;
+    const resize = () => { W = canvas.width = canvas.parentElement.offsetWidth; H = canvas.height = canvas.parentElement.offsetHeight; };
+    resize();
+    window.addEventListener('resize', resize, { passive: true });
+    const blobs = COLS.map((c, i) => ({ x: W * (0.1 + i * 0.12), y: H * (0.3 + (i % 3) * 0.2), r: 60 + i * 10, dx: 0.2 + i * 0.05, dy: 0.15 + i * 0.04, col: c }));
     (function loop() {
       ctx.clearRect(0, 0, W, H);
-      parts.forEach(p => {
-        p.x = (p.x+p.vx+W)%W; p.y = (p.y+p.vy+H)%H;
-        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-        ctx.fillStyle = `rgba(${p.c.join()},${p.a})`; ctx.fill();
+      blobs.forEach(b => {
+        b.x = (b.x + b.dx + W) % W; b.y = (b.y + b.dy + H) % H;
+        const g = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r);
+        g.addColorStop(0, b.col.replace(')', ' / 0.55)').replace('oklch', 'oklch'));
+        g.addColorStop(1, 'transparent');
+        ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+        ctx.fillStyle = g; ctx.fill();
       });
-      for (let i = 0; i < parts.length; i++) for (let j = i+1; j < parts.length; j++) {
-        const dx = parts[i].x-parts[j].x, dy = parts[i].y-parts[j].y, d = Math.hypot(dx, dy);
-        if (d < 110) { const c = parts[i].c;
-          ctx.beginPath(); ctx.moveTo(parts[i].x, parts[i].y); ctx.lineTo(parts[j].x, parts[j].y);
-          ctx.strokeStyle = `rgba(${c.join()},${(1-d/110)*.08})`; ctx.lineWidth = .8; ctx.stroke();
-        }
-      }
       requestAnimationFrame(loop);
     })();
     return;
   }
 
-  /* ── Compile & link ── */
   function mkShader(type, src) {
     const s = gl.createShader(type);
     gl.shaderSource(s, src); gl.compileShader(s);
@@ -1897,19 +948,19 @@ window.addEventListener('scroll', () => {
   const prog = gl.createProgram();
   gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
   if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { console.warn(gl.getProgramInfoLog(prog)); return; }
-
   gl.useProgram(prog);
-  const quadBuf = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
+
+  gl.clearColor(1, 1, 1, 1);
+
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]), gl.STATIC_DRAW);
   const aPos = gl.getAttribLocation(prog, 'a_pos');
   gl.enableVertexAttribArray(aPos);
   gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
 
-  const uRes   = gl.getUniformLocation(prog, 'u_res'),
-        uTime  = gl.getUniformLocation(prog, 'u_time'),
-        uMouse = gl.getUniformLocation(prog, 'u_mouse'),
-        uScroll= gl.getUniformLocation(prog, 'u_scroll');
+  const uRes = gl.getUniformLocation(prog,'u_res'), uTime = gl.getUniformLocation(prog,'u_time'),
+        uMouse = gl.getUniformLocation(prog,'u_mouse'), uScroll = gl.getUniformLocation(prog,'u_scroll');
 
   let W, H;
   const resize = () => {
@@ -1920,18 +971,16 @@ window.addEventListener('scroll', () => {
   resize();
   window.addEventListener('resize', resize, { passive: true });
 
-  /* mouse / touch — tracked on hero parent (canvas has pointer-events:none) */
   let mx = 0.5, my = 0.5;
   const hero = canvas.parentElement;
   const track = (cx, cy) => {
-    const rect = hero.getBoundingClientRect();
-    mx = (cx - rect.left) / rect.width;
-    my = 1.0 - (cy - rect.top) / rect.height;
+    const r = hero.getBoundingClientRect();
+    mx = (cx - r.left) / r.width;
+    my = 1.0 - (cy - r.top) / r.height;
   };
   hero.addEventListener('mousemove', e => track(e.clientX, e.clientY), { passive: true });
   hero.addEventListener('touchmove', e => track(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
 
-  /* pause rendering when hero is off-screen */
   let vis = true;
   new IntersectionObserver(([e]) => { vis = e.isIntersecting; }, { threshold: 0 }).observe(hero);
 
@@ -1940,140 +989,68 @@ window.addEventListener('scroll', () => {
     requestAnimationFrame(frame);
     if (!vis) return;
     const t = (performance.now() - t0) / 1000;
+    gl.clear(gl.COLOR_BUFFER_BIT);
     gl.uniform2f(uRes, W, H);
     gl.uniform1f(uTime, t);
     gl.uniform2f(uMouse, mx, my);
     gl.uniform1f(uScroll, Math.min(window.scrollY / Math.max(innerHeight, 1), 1));
     gl.drawArrays(gl.TRIANGLES, 0, 6);
   })();
-})()
+})();
 
-/* ── Intersection Observer (reveal) ── */
-const revealObs = new IntersectionObserver((entries) => {
+/* ── Intersection Observer (reveal + counters) ── */
+const obs = new IntersectionObserver(entries => {
   entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.classList.add('visible');
-
-      // Animate counters
-      if (e.target.classList.contains('stat-item')) {
-        const el = e.target.querySelector('[data-count]');
-        if (el && !el.dataset.animated) {
-          el.dataset.animated = '1';
-          animateCount(el);
-        }
-      }
-
-      // Animate goal bars
-      e.target.querySelectorAll('.goal-bar[data-width]').forEach(bar => {
-        if (!bar.dataset.animated) {
-          bar.dataset.animated = '1';
-          setTimeout(() => { bar.style.width = bar.dataset.width + '%'; }, 200);
-        }
-      });
-    }
+    if (!e.isIntersecting) return;
+    e.target.classList.add('vis');
+    e.target.querySelectorAll('[data-count]').forEach(el => {
+      if (el._counted) return;
+      el._counted = true;
+      const target = +el.dataset.count, suffix = el.dataset.suffix || '';
+      const dur = target > 500 ? 1800 : 1400, start = Date.now();
+      (function step() {
+        const p = Math.min((Date.now() - start) / dur, 1);
+        const e2 = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(e2 * target).toLocaleString('de-DE') + suffix;
+        if (p < 1) requestAnimationFrame(step);
+      })();
+    });
   });
 }, { threshold: 0.12 });
 
-document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => revealObs.observe(el));
+document.querySelectorAll('.reveal,.reveal-l,.reveal-r').forEach(el => obs.observe(el));
 
-/* ── Animated Counter (defined below with pulse) ── */
+/* ── Horizontal scroll (drag) ── */
+const scr = document.getElementById('colScroll');
+let isDown = false, startX, scrollL;
+scr.addEventListener('mousedown', e => { isDown = true; scr.classList.add('grabbing'); startX = e.pageX - scr.offsetLeft; scrollL = scr.scrollLeft; });
+window.addEventListener('mouseup', () => { isDown = false; scr.classList.remove('grabbing'); });
+scr.addEventListener('mousemove', e => { if (!isDown) return; e.preventDefault(); scr.scrollLeft = scrollL - (e.pageX - scr.offsetLeft - startX); });
 
-/* ── Card tilt effect (only on hover-capable, fine-pointer, motion-OK) ── */
-const canHover     = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-if (canHover && !reducedMotion) {
-  document.querySelectorAll('.color-card, .usp-card, .app-card').forEach(card => {
-    card.addEventListener('mousemove', e => {
-      const r = card.getBoundingClientRect();
-      const x = (e.clientX - r.left) / r.width  - 0.5;
-      const y = (e.clientY - r.top)  / r.height - 0.5;
-      card.style.transform = `translateY(-6px) rotateX(${-y * 6}deg) rotateY(${x * 6}deg) scale(1.02)`;
-    });
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = '';
-      card.style.transition = 'transform 0.4s cubic-bezier(0.23,1,0.32,1), border-color 0.25s, box-shadow 0.25s';
-    });
+/* ── Magnetic CTA ── */
+const magBtn = document.getElementById('hero-cta');
+if (magBtn && window.matchMedia('(hover:hover)').matches && !window.matchMedia('(prefers-reduced-motion:reduce)').matches) {
+  const wrap = magBtn.parentElement;
+  wrap.addEventListener('mousemove', e => {
+    const r = wrap.getBoundingClientRect();
+    const dx = (e.clientX - r.left - r.width / 2) * 0.32;
+    const dy = (e.clientY - r.top - r.height / 2) * 0.32;
+    magBtn.style.transform = `translate(${dx}px,${dy}px)`;
+    magBtn.style.transition = 'transform 0.12s cubic-bezier(0.23,1,0.32,1)';
+  });
+  wrap.addEventListener('mouseleave', () => {
+    magBtn.style.transform = '';
+    magBtn.style.transition = 'transform 0.4s cubic-bezier(0.23,1,0.32,1), opacity 0.2s, box-shadow 0.2s';
   });
 }
 
-/* ── Smooth scroll for nav links ── */
+/* ── Smooth scroll ── */
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {
-    const target = document.querySelector(a.getAttribute('href'));
-    if (target) {
-      e.preventDefault();
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
   });
 });
-
-/* ── Scroll Progress Bar ── */
-const progressBar = document.getElementById('scroll-progress');
-function updateProgress() {
-  const scrollTop = window.scrollY;
-  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-  progressBar.style.width = Math.min((scrollTop / docHeight) * 100, 100) + '%';
-}
-window.addEventListener('scroll', updateProgress, { passive: true });
-
-/* ── Ripple Effect ── */
-document.querySelectorAll('.ripple-host').forEach(btn => {
-  btn.addEventListener('click', e => {
-    const r    = btn.getBoundingClientRect();
-    const size = Math.max(r.width, r.height);
-    const x    = e.clientX - r.left - size / 2;
-    const y    = e.clientY - r.top  - size / 2;
-    const rpl  = document.createElement('span');
-    rpl.className = 'ripple';
-    rpl.style.cssText = `width:${size}px;height:${size}px;left:${x}px;top:${y}px`;
-    btn.appendChild(rpl);
-    rpl.addEventListener('animationend', () => rpl.remove());
-  });
-});
-
-/* ── Magnetic Button ── */
-const magneticWrap = document.querySelector('.magnetic-wrap');
-const magneticBtn  = document.getElementById('hero-cta');
-if (magneticWrap && magneticBtn && window.matchMedia('(hover:hover)').matches
-    && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-  magneticWrap.addEventListener('mousemove', e => {
-    const r  = magneticWrap.getBoundingClientRect();
-    const cx = r.left + r.width  / 2;
-    const cy = r.top  + r.height / 2;
-    const dx = (e.clientX - cx) * 0.35;
-    const dy = (e.clientY - cy) * 0.35;
-    magneticBtn.style.transform = `translate(${dx}px, ${dy}px)`;
-    magneticBtn.style.transition = 'transform 0.15s cubic-bezier(0.23,1,0.32,1)';
-  });
-  magneticWrap.addEventListener('mouseleave', () => {
-    magneticBtn.style.transform = '';
-    magneticBtn.style.transition = 'transform 0.4s cubic-bezier(0.23,1,0.32,1), opacity 0.2s, box-shadow 0.2s';
-  });
-}
-
-/* ── Animated Counter with pulse on completion ── */
-function animateCount(el) {
-  const target   = parseInt(el.dataset.count, 10);
-  const suffix   = el.dataset.suffix || '';
-  const start    = Date.now();
-  const duration = target > 1000 ? 1800 : 1400;
-  function step() {
-    const progress = Math.min((Date.now() - start) / duration, 1);
-    const eased    = 1 - Math.pow(1 - progress, 3);
-    const current  = Math.round(eased * target);
-    el.textContent = current.toLocaleString('de-DE') + suffix;
-    if (progress < 1) {
-      requestAnimationFrame(step);
-    } else {
-      el.textContent = target.toLocaleString('de-DE') + suffix;
-      el.classList.add('done');
-      el.addEventListener('animationend', () => el.classList.remove('done'), { once: true });
-    }
-  }
-  requestAnimationFrame(step);
-}
 </script>
-
 </body>
 </html>
